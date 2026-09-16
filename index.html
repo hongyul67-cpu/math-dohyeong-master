@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>도형의 방정식 자습</title>
+<!-- 수업용 「모두 같은 문제」 — 다른 공용 스크립트보다 먼저 -->
+<script src="https://hongyul67-cpu.github.io/links/fixorder.js"></script>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --line:#e2e5ea; --tx:#1c2430; --dim:#6b7684;
+    --pri:#2563eb; --ok:#12a150; --no:#e5484d; --warn:#f5a524;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:15px/1.65 "Pretendard","맑은 고딕",system-ui,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:16px 14px 110px}
+
+  header{display:flex;align-items:baseline;gap:10px;margin:6px 0 14px;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0;font-weight:800}
+  header .sub{color:var(--dim);font-size:13px}
+
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);
+       cursor:pointer;font-weight:700;font-size:14px;color:var(--dim)}
+  .tab.on{background:var(--pri);border-color:var(--pri);color:#fff}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        padding:16px 18px;margin-bottom:12px}
+  .card h3{margin:0 0 8px;font-size:16px}
+  .kw{background:#eef4ff;color:#1d4ed8;border-radius:6px;padding:1px 6px;font-weight:700}
+
+  .btn{border:1px solid var(--line);background:var(--card);border-radius:10px;
+       padding:10px 16px;font-weight:700;cursor:pointer;font-size:14px;color:var(--tx)}
+  .btn:hover{border-color:var(--pri)}
+  .btn-primary{background:var(--pri);border-color:var(--pri);color:#fff}
+  .btn-ghost{background:#f1f4f9}
+  .btn:disabled{opacity:.5;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+  .qnum{color:var(--dim);font-size:13px;font-weight:700}
+  .qtext{font-size:17px;font-weight:700;margin:6px 0 12px;line-height:1.6}
+  .explain{background:#f8fafc;border-left:3px solid var(--pri);border-radius:0 8px 8px 0;
+           padding:12px 14px;margin-top:12px;color:#334}
+  .explain ol{margin:6px 0 0 0;padding-left:20px}
+  .explain li{margin:5px 0}
+  .progress{height:8px;background:#e8ebf0;border-radius:99px;overflow:hidden;margin:10px 0 16px}
+  .progress > i{display:block;height:100%;background:var(--pri);width:0;transition:width .25s}
+
+  .empty{color:var(--dim);text-align:center;padding:34px 10px}
+  .score{font-size:34px;font-weight:900;letter-spacing:-1px}
+  .muted{color:var(--dim);font-size:13px}
+  .pill{display:inline-block;background:#eef1f5;border-radius:99px;padding:2px 10px;
+        font-size:12px;font-weight:700;color:var(--dim)}
+  .pill.u1{background:#e7f0ff;color:#1d4ed8}
+  .pill.u2{background:#e8f7ee;color:#0f7a3d}
+  .pill.u3{background:#fdf0e2;color:#a85b04}
+
+  /* 수식 */
+  .mt{font-family:"Cambria Math","Times New Roman",serif;font-style:italic}
+  .fr{display:inline-block;vertical-align:-0.55em;text-align:center;margin:0 3px}
+  .fr > span{display:block;padding:0 4px}
+  .fr > span.nu{border-bottom:1.4px solid currentColor}
+  .sq{white-space:nowrap}
+  .sq > span{border-top:1.4px solid currentColor;padding:0 2px 0 1px;margin-left:-1px}
+
+  /* 공식 상자 */
+  .fx{background:#f4f8ff;border:1px solid #d7e5ff;border-radius:12px;padding:12px 14px;margin:10px 0}
+  .fx b{color:#1d4ed8}
+  .warnbox{background:#fff7e8;border:1px solid #f6e0b5;border-radius:12px;padding:10px 14px;margin:10px 0}
+
+  /* 입력칸 */
+  .fields{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 4px}
+  .fld{display:flex;flex-direction:column;gap:4px}
+  .fld label{font-size:12px;color:var(--dim);font-weight:700}
+  .fld input,.fld select{border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+        font-size:16px;width:132px;background:#fff;color:var(--tx)}
+  .fld input:focus,.fld select:focus{outline:2px solid #bcd3ff;border-color:var(--pri)}
+  .fld.good input,.fld.good select{border-color:var(--ok);background:#eafaf1}
+  .fld.bad  input,.fld.bad  select{border-color:var(--no);background:#fdeeee}
+
+  .verdict{font-weight:800;margin-top:10px;font-size:16px}
+  .verdict.ok{color:var(--ok)}
+  .verdict.no{color:var(--no)}
+  .combo{font-weight:800;color:var(--warn)}
+
+  /* 주제 목록 */
+  .tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  .titem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+         cursor:pointer;text-align:left;font:inherit;color:inherit}
+  .titem:hover{border-color:var(--pri)}
+  .titem b{display:block;font-size:15px;margin:3px 0 2px}
+  .titem .d{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .done{color:var(--ok);font-weight:800;font-size:12px}
+
+  svg.plane{max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px}
+  .figwrap{margin:10px 0;text-align:center}
+  table.kv{border-collapse:collapse;margin:8px 0;font-size:14px}
+  table.kv td,table.kv th{border:1px solid var(--line);padding:6px 10px}
+  table.kv th{background:#f2f5f9}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>📐 도형의 방정식 자습</h1>
+    <span class="sub" id="hdSub"></span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-view="learn">📖 배우기</button>
+    <button class="tab"    data-view="practice">✏️ 연습</button>
+    <button class="tab"    data-view="exam">🏁 종합시험 20문항</button>
+    <button class="tab"    data-view="wrong">📕 오답노트</button>
+  </div>
+
+  <div id="view"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   도형의 방정식 자습  —  고등 수학(상) Ⅰ. 도형의 방정식
+   자습 학습지 01~08차시(중점·무게중심·내분점 / 두 점 사이의 거리·직선의 방정식 /
+   점과 직선 사이의 거리·원의 방정식 / 원의 넓이)를 혼자서도 풀 수 있게 만든 도구입니다.
+
+   ▸ 문제는 풀 때마다 숫자가 바뀝니다(생성기 방식).
+   ▸ 문제를 더 넣고 싶으면 아래 TOPICS 배열만 고치면 됩니다. → README.md
+   규약: https://github.com/hongyul67-cpu/links/blob/master/CONVENTIONS.md
+   ══════════════════════════════════════════════════════════════ */
+
+/* ───────── 0) 잔심부름 함수 ───────── */
+const $  = s => document.querySelector(s);
+const el = h => { const d=document.createElement('div'); d.innerHTML=h.trim(); return d.firstElementChild; };
+const R  = (a,b) => a + Math.floor(Math.random()*(b-a+1));            // a 이상 b 이하 정수
+const RZ = (a,b) => { let v; do{ v=R(a,b); }while(v===0); return v; }; // 0 은 빼고
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = a => { const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=r[i]; r[i]=r[j]; r[j]=t; } return r; };
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){ const t=b; b=a%b; a=t; } return a||1; };
+
+/* 분수를 기약분수로 — [분자, 분모], 분모는 항상 양수 */
+function red(p,q){ if(q<0){ p=-p; q=-q; } const g=gcd(p,q); return [p/g,q/g]; }
+/* 분수를 글자로 : 3/2 · -1/2 · 4 */
+function frs(p,q){ const r=red(p,q); return r[1]===1 ? String(r[0]) : r[0]+'/'+r[1]; }
+/* 분수를 화면용 HTML 로 */
+function frh(p,q){
+  const r=red(p,q);
+  if(r[1]===1) return N(r[0]);
+  const s = r[0]<0 ? '−' : '';
+  return s+'<span class="fr"><span class="nu">'+Math.abs(r[0])+'</span><span>'+r[1]+'</span></span>';
+}
+/* 제곱근 HTML */
+function sqh(x){ return '<span class="sq">√<span>'+x+'</span></span>'; }
+/* 음수 부호를 수학에서 쓰는 − 로 */
+function N(v){ return String(v).replace(/^-/,'−'); }
+/* 좌표 HTML */
+function P(x,y){ return '('+N(x)+', '+N(y)+')'; }
+const X = '<span class="mt">x</span>';
+const Y = '<span class="mt">y</span>';
+/* 부호 붙여 이어 쓰기 :  + 3 / − 3 */
+function sg(v){ return (v<0? ' − ' : ' + ') + Math.abs(v); }
+/* 계수 붙은 항 :  3x · −x · x  (c=0 이면 빈 글자) */
+function term(c,v){ if(c===0) return ''; if(c===1) return v; if(c===-1) return '−'+v; return c+v; }
+/* 부호 붙은 항 :  + 3x / − x */
+function sterm(c,v){ if(c===0) return ''; const s = c<0?' − ':' + '; const a=Math.abs(c); return s+(a===1? v : a+v); }
+/* ax + by + c = 0 꼴 */
+function lineGen(a,b,c){
+  let s = term(a,X);
+  s += sterm(b,Y);
+  if(c!==0) s += sg(c);
+  return s + ' = 0';
+}
+/* y = mx + n 꼴.  m,n 은 정수 또는 [분자,분모] */
+function lineMN(m,n){
+  const isF = Array.isArray(m);
+  const mv = isF ? m[0]/m[1] : m;
+  const nv = Array.isArray(n) ? n[0]/n[1] : n;
+  let s = Y+' = ';
+  if(mv===0){ s += (Array.isArray(n)? frh(n[0],n[1]) : String(n)); return s; }
+  if(isF) s += frh(m[0],m[1])+X;
+  else s += (m===1?'':(m===-1?'−':String(m)))+X;
+  if(nv!==0){
+    s += (nv<0?' − ':' + ') + (Array.isArray(n)? frh(Math.abs(n[0]),n[1]) : String(Math.abs(n)));
+  }
+  return s;
+}
+/* 숫자 읽기 — "3/2", "-0.5", "( 3 )" 모두 처리 */
+function val(s){
+  s = String(s).trim().replace(/\s+/g,'').replace(/[−–—]/g,'-').replace(/[()（）]/g,'');
+  if(s==='') return NaN;
+  const m = s.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+  if(m){ const d=parseFloat(m[2]); return d===0?NaN:parseFloat(m[1])/d; }
+  if(/^[-+]?\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+  return NaN;
+}
+function same(u,a){
+  const x=val(u), y=val(a);
+  if(!isNaN(x) && !isNaN(y)) return Math.abs(x-y) < 1e-9;
+  return String(u).trim().replace(/\s+/g,'') === String(a).trim().replace(/\s+/g,'');
+}
+
+/* ───────── 1) 좌표평면 그림 (SVG 직접 그리기) ─────────
+   items 종류
+     {t:'pt',   x,y, label, color}        점
+     {t:'seg',  x1,y1,x2,y2, dash}        선분
+     {t:'line', a,b,c}                    직선 ax+by+c=0
+     {t:'circle', cx,cy, r}               원
+*/
+function plane(o){
+  const xmin=o.xmin, xmax=o.xmax, ymin=o.ymin, ymax=o.ymax;
+  const u = o.u || 26;                                  // 1칸 픽셀
+  const pad = 14;
+  const w = (xmax-xmin)*u + pad*2, h = (ymax-ymin)*u + pad*2;
+  const px = x => pad + (x-xmin)*u;
+  const py = y => pad + (ymax-y)*u;
+  let s = '<svg class="plane" viewBox="0 0 '+w+' '+h+'" width="'+w+'" role="img">';
+  s += '<defs><clipPath id="cp'+(plane.n=(plane.n||0)+1)+'"><rect x="'+pad+'" y="'+pad+'" width="'+(w-pad*2)+'" height="'+(h-pad*2)+'"/></clipPath></defs>';
+  const cid = 'cp'+plane.n;
+  for(let x=xmin;x<=xmax;x++) s += '<line x1="'+px(x)+'" y1="'+pad+'" x2="'+px(x)+'" y2="'+(h-pad)+'" stroke="#eceff4"/>';
+  for(let y=ymin;y<=ymax;y++) s += '<line x1="'+pad+'" y1="'+py(y)+'" x2="'+(w-pad)+'" y2="'+py(y)+'" stroke="#eceff4"/>';
+  if(ymin<=0&&ymax>=0) s += '<line x1="'+pad+'" y1="'+py(0)+'" x2="'+(w-pad)+'" y2="'+py(0)+'" stroke="#9aa4b2" stroke-width="1.4"/>';
+  if(xmin<=0&&xmax>=0) s += '<line x1="'+px(0)+'" y1="'+pad+'" x2="'+px(0)+'" y2="'+(h-pad)+'" stroke="#9aa4b2" stroke-width="1.4"/>';
+  for(let x=xmin;x<=xmax;x++){ if(x===0||x%2!==0) continue; s += '<text x="'+px(x)+'" y="'+(py(0)+13)+'" font-size="9" fill="#8b94a3" text-anchor="middle">'+x+'</text>'; }
+  for(let y=ymin;y<=ymax;y++){ if(y===0||y%2!==0) continue; s += '<text x="'+(px(0)-5)+'" y="'+(py(y)+3)+'" font-size="9" fill="#8b94a3" text-anchor="end">'+y+'</text>'; }
+  s += '<text x="'+(px(0)-5)+'" y="'+(py(0)+12)+'" font-size="9" fill="#8b94a3" text-anchor="end">O</text>';
+  (o.items||[]).forEach(function(it){
+    const col = it.color || '#2563eb';
+    if(it.t==='seg'){
+      s += '<line x1="'+px(it.x1)+'" y1="'+py(it.y1)+'" x2="'+px(it.x2)+'" y2="'+py(it.y2)+'" stroke="'+col+'" stroke-width="2"'+(it.dash?' stroke-dasharray="5 4"':'')+'/>';
+    } else if(it.t==='line'){
+      let p1,p2;
+      if(it.b!==0){ p1=[xmin,(-it.c-it.a*xmin)/it.b]; p2=[xmax,(-it.c-it.a*xmax)/it.b]; }
+      else { p1=[-it.c/it.a,ymin]; p2=[-it.c/it.a,ymax]; }
+      s += '<line clip-path="url(#'+cid+')" x1="'+px(p1[0])+'" y1="'+py(p1[1])+'" x2="'+px(p2[0])+'" y2="'+py(p2[1])+'" stroke="'+col+'" stroke-width="2"'+(it.dash?' stroke-dasharray="5 4"':'')+'/>';
+    } else if(it.t==='circle'){
+      s += '<circle clip-path="url(#'+cid+')" cx="'+px(it.cx)+'" cy="'+py(it.cy)+'" r="'+(it.r*u)+'" fill="'+(it.fill||'rgba(37,99,235,.07)')+'" stroke="'+col+'" stroke-width="2"/>';
+    } else if(it.t==='pt'){
+      s += '<circle cx="'+px(it.x)+'" cy="'+py(it.y)+'" r="4" fill="'+col+'"/>';
+      if(it.label) s += '<text x="'+(px(it.x)+7)+'" y="'+(py(it.y)-7)+'" font-size="11" font-weight="700" fill="'+col+'">'+it.label+'</text>';
+    }
+  });
+  s += '</svg>';
+  return '<div class="figwrap">'+s+'</div>';
+}
+
+/* 점들이 다 보이도록 좌표평면 범위를 자동으로 잡아 준다 */
+function fit(pts, extra){
+  const m = (extra===undefined?1:extra);
+  let xmin=0,xmax=0,ymin=0,ymax=0;
+  pts.forEach(function(p){ xmin=Math.min(xmin,p[0]); xmax=Math.max(xmax,p[0]);
+                           ymin=Math.min(ymin,p[1]); ymax=Math.max(ymax,p[1]); });
+  xmin-=m; xmax+=m; ymin-=m; ymax+=m;
+  const span=Math.max(xmax-xmin,ymax-ymin);
+  const u=Math.max(9,Math.min(24,Math.floor(320/span)));
+  return {xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,u:u};
+}
+function planeOf(pts, items, extra){
+  const f = fit(pts, extra); f.items = items; return plane(f);
+}
+/* (x − a)² 꼴 */
+function sqx(v,a){
+  if(a===0) return v+'²';
+  return '('+v+(a>0?' − ':' + ')+Math.abs(a)+')²';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ▼▼▼  문제를 더 넣을 곳은 여기부터입니다  ▼▼▼
+   TOPICS  = 주제 목록.  주제마다 concept(개념) 과 gens(문제 생성기) 를 갖습니다.
+   생성기 하나는 아래 모양의 객체를 돌려주면 됩니다.
+
+     {
+       tag   : '오답노트에 남길 짧은 이름',
+       q     : '발문 (HTML)',
+       fig   : '문제에 함께 보여 줄 그림 (없으면 생략)',
+       solFig: '해설에서만 보여 줄 그림 (정답이 보이는 그림은 반드시 여기에)',
+       hint  : '공식만 알려 주는 힌트 — 숫자를 대입한 결과는 절대 넣지 말 것',
+       fields: [{label:'칸 이름', ans:['정답','다른표기']}, …],
+       sol   : ['풀이 1단계','2단계', …]
+     }
+   ══════════════════════════════════════════════════════════════ */
+
+/* ───── 1. 선분의 중점 ───── */
+function g_mid1(){
+  const x1=R(-8,8), y1=R(-8,8);
+  let x2,y2;
+  do{ x2=R(-8,8); }while((x1+x2)%2!==0 || x2===x1);
+  do{ y2=R(-8,8); }while((y1+y2)%2!==0 || y2===y1);
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2]},
+    tag:'중점 구하기',
+    q:'두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 를 이은 선분 AB 의 <b>중점 M</b> 의 좌표를 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    hint:'중점의 좌표 = 양 끝점 좌표의 <b>평균</b>',
+    fields:[{label:'M 의 '+X+'좌표',ans:[String(mx)]},{label:'M 의 '+Y+'좌표',ans:[String(my)]}],
+    sol:[
+      '중점은 양 끝점 좌표의 <b>평균</b>입니다.',
+      X+'좌표 : ('+x1+sg(x2)+') ÷ 2 = '+(x1+x2)+' ÷ 2 = <b>'+mx+'</b>',
+      Y+'좌표 : ('+y1+sg(y2)+') ÷ 2 = '+(y1+y2)+' ÷ 2 = <b>'+my+'</b>',
+      '따라서 M'+P(mx,my)+' 입니다.'
+    ]
+  };
+}
+function g_mid2(){
+  const x1=R(-7,7), y1=R(-7,7);
+  const mx=R(-7,7), my=R(-7,7);
+  if(mx===x1 && my===y1) return g_mid2();
+  const x2=2*mx-x1, y2=2*my-y1;
+  return {
+    _dbg:{A:[x1,y1],M:[mx,my]},
+    tag:'중점으로 나머지 끝점 찾기',
+    q:'선분 AB 의 중점이 M'+P(mx,my)+' 이고 한 끝점이 A'+P(x1,y1)+' 일 때, 다른 끝점 <b>B</b> 의 좌표를 구하시오.',
+    fig: planeOf([[x1,y1],[mx,my]],[{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:mx,y:my,label:'M',color:'#e5484d'}]),
+    hint:'M 의 좌표 = (A 좌표 + B 좌표) ÷ 2 이므로, <b>A 좌표 + B 좌표 = M 좌표 × 2</b> 입니다.',
+    fields:[{label:'B 의 '+X+'좌표',ans:[String(x2)]},{label:'B 의 '+Y+'좌표',ans:[String(y2)]}],
+    sol:[
+      'B의 좌표를 ('+X+', '+Y+') 라 놓습니다.',
+      X+'좌표 : ('+x1+' + '+X+') ÷ 2 = '+mx+' → '+x1+' + '+X+' = '+(2*mx)+' → '+X+' = <b>'+x2+'</b>',
+      Y+'좌표 : ('+y1+' + '+Y+') ÷ 2 = '+my+' → '+y1+' + '+Y+' = '+(2*my)+' → '+Y+' = <b>'+y2+'</b>',
+      '따라서 B'+P(x2,y2)+' 입니다. (M 이 A 와 B 의 한가운데인지 그림으로 확인해 보세요.)'
+    ]
+  };
+}
+
+/* ───── 2. 삼각형의 무게중심 ───── */
+function g_cent1(){
+  let x1,x2,x3,y1,y2,y3;
+  do{ x1=R(-8,8); x2=R(-8,8); x3=R(-8,8); }while((x1+x2+x3)%3!==0);
+  do{ y1=R(-8,8); y2=R(-8,8); y3=R(-8,8); }while((y1+y2+y3)%3!==0);
+  const gx=(x1+x2+x3)/3, gy=(y1+y2+y3)/3;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2],C:[x3,y3]},
+    tag:'무게중심 구하기',
+    q:'삼각형 ABC 의 세 꼭짓점이 A'+P(x1,y1)+', B'+P(x2,y2)+', C'+P(x3,y3)+' 일 때, <b>무게중심 G</b> 의 좌표를 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2],[x3,y3]],[
+          {t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},{t:'seg',x1:x2,y1:y2,x2:x3,y2:y3},{t:'seg',x1:x3,y1:y3,x2:x1,y2:y1},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'},{t:'pt',x:x3,y:y3,label:'C'}]),
+    hint:'무게중심의 좌표 = 세 꼭짓점 좌표의 <b>평균</b>',
+    fields:[{label:'G 의 '+X+'좌표',ans:[String(gx)]},{label:'G 의 '+Y+'좌표',ans:[String(gy)]}],
+    sol:[
+      '무게중심은 세 꼭짓점 좌표의 <b>평균</b>입니다.',
+      X+'좌표 : ('+x1+sg(x2)+sg(x3)+') ÷ 3 = '+(x1+x2+x3)+' ÷ 3 = <b>'+gx+'</b>',
+      Y+'좌표 : ('+y1+sg(y2)+sg(y3)+') ÷ 3 = '+(y1+y2+y3)+' ÷ 3 = <b>'+gy+'</b>',
+      '따라서 G'+P(gx,gy)+' 입니다.'
+    ]
+  };
+}
+function g_cent2(){
+  let a,x2,x3,y1,y2,y3;
+  do{ a=R(-7,7); x2=R(-7,7); x3=R(-7,7); }while((a+x2+x3)%3!==0);
+  do{ y1=R(-7,7); y2=R(-7,7); y3=R(-7,7); }while((y1+y2+y3)%3!==0);
+  const gx=(a+x2+x3)/3, b=(y1+y2+y3)/3;
+  return {
+    _dbg:{B:[x2,y2],C:[x3,y3],G:[gx,b]},
+    tag:'무게중심에서 미지수 찾기',
+    q:'세 점 A(<i>a</i>, '+y1+'), B'+P(x2,y2)+', C'+P(x3,y3)+' 를 꼭짓점으로 하는 삼각형 ABC 의 무게중심의 좌표가 ('+gx+', <i>b</i>) 일 때, 상수 <i>a</i>, <i>b</i> 의 값을 구하시오.',
+    hint:'무게중심의 '+X+'좌표 = 세 '+X+'좌표의 합 ÷ 3. 이 식을 <i>a</i> 에 대해 풉니다.',
+    fields:[{label:'a 의 값',ans:[String(a)]},{label:'b 의 값',ans:[String(b)]}],
+    sol:[
+      X+'좌표로 식을 세우면 : (<i>a</i>'+sg(x2)+sg(x3)+') ÷ 3 = '+gx,
+      '→ <i>a</i>'+sg(x2+x3)+' = '+(3*gx)+' → <i>a</i> = '+(3*gx)+' '+(x2+x3>=0?'−':'+')+' '+Math.abs(x2+x3)+' = <b>'+a+'</b>',
+      Y+'좌표로 식을 세우면 : <i>b</i> = ('+y1+sg(y2)+sg(y3)+') ÷ 3 = '+(y1+y2+y3)+' ÷ 3 = <b>'+b+'</b>',
+      '따라서 <i>a</i> = '+a+', <i>b</i> = '+b+' 입니다.'
+    ]
+  };
+}
+
+/* ───── 3. 선분의 내분점 ───── */
+function g_div1(){
+  const mn=pick([[1,2],[2,1],[2,3],[3,2],[1,3],[3,1],[1,4],[4,1],[3,4],[4,3]]);
+  const m=mn[0], n=mn[1], s=m+n;
+  const x1=R(-5,5), y1=R(-5,5);
+  const kx=pick([-2,-1,1,2]), ky=pick([-2,-1,1,2]);
+  const x2=x1+s*kx, y2=y1+s*ky;
+  const px=x1+m*kx, py=y1+m*ky;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2],m:m,n:n},
+    tag:m+':'+n+' 내분점',
+    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 에 대하여 선분 AB 를 <b>'+m+' : '+n+'</b> 으로 내분하는 점 P 의 좌표를 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    hint:'A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>), B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>) 를 <i>m</i> : <i>n</i> 으로 내분하는 점은 '
+        +'( <span class="fr"><span class="nu"><i>mx</i><sub>2</sub> + <i>nx</i><sub>1</sub></span><span><i>m</i> + <i>n</i></span></span>, '
+        +'<span class="fr"><span class="nu"><i>my</i><sub>2</sub> + <i>ny</i><sub>1</sub></span><span><i>m</i> + <i>n</i></span></span> ) — '
+        +'<b>뒷점 좌표에 앞의 수 m 을 곱한다</b>는 것만 기억하면 됩니다.',
+    fields:[{label:'P 의 '+X+'좌표',ans:[String(px)]},{label:'P 의 '+Y+'좌표',ans:[String(py)]}],
+    sol:[
+      '공식에 <i>m</i> = '+m+', <i>n</i> = '+n+' 을 넣습니다. 분모는 <i>m</i> + <i>n</i> = '+s+' 입니다.',
+      X+'좌표 : ('+m+'×'+x2+' + '+n+'×'+x1+') ÷ '+s+' = ('+(m*x2)+sg(n*x1)+') ÷ '+s+' = '+(m*x2+n*x1)+' ÷ '+s+' = <b>'+px+'</b>',
+      Y+'좌표 : ('+m+'×'+y2+' + '+n+'×'+y1+') ÷ '+s+' = ('+(m*y2)+sg(n*y1)+') ÷ '+s+' = '+(m*y2+n*y1)+' ÷ '+s+' = <b>'+py+'</b>',
+      '따라서 P'+P(px,py)+' 입니다. 그림에서 P 는 A 쪽에서 '+m+'칸, B 쪽에서 '+n+'칸 되는 자리입니다.'
+    ]
+  };
+}
+function g_div2(){
+  const mn=pick([[1,2],[2,1],[3,1],[1,3],[2,3],[3,2]]);
+  const m=mn[0], n=mn[1], s=m+n;
+  const t=RZ(-3,3);
+  const x1=m*t;                 // a = -n*t 가 정수가 되도록
+  const a=-n*t;
+  const y1=R(-5,5), ky=pick([-2,-1,1,2]);
+  const y2=y1+s*ky;
+  const py=y1+m*ky;
+  return {
+    _dbg:{A:[x1,y1],By:y2,m:m,n:n},
+    tag:'내분점이 축 위에 있을 조건',
+    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B(<i>a</i>, '+y2+') 를 이은 선분 AB 를 <b>'+m+' : '+n+'</b> 으로 내분하는 점 P 가 '+Y+'축 위에 있다. 상수 <i>a</i> 의 값과 점 P 의 좌표를 구하시오.',
+    hint:''+Y+'축 위의 점은 '+X+'좌표가 0 입니다. 내분점 공식으로 P 의 '+X+'좌표를 <i>a</i> 로 나타낸 뒤 0 으로 놓습니다.',
+    fields:[{label:'a 의 값',ans:[String(a)]},{label:'P 의 '+X+'좌표',ans:['0']},{label:'P 의 '+Y+'좌표',ans:[String(py)]}],
+    sol:[
+      'P 의 '+X+'좌표 = ('+m+'×<i>a</i> + '+n+'×'+x1+') ÷ '+s+' = ('+m+'<i>a</i>'+sg(n*x1)+') ÷ '+s,
+      'P 가 '+Y+'축 위의 점이므로 '+X+'좌표가 0 입니다. → '+m+'<i>a</i>'+sg(n*x1)+' = 0 → <i>a</i> = <b>'+a+'</b>',
+      'P 의 '+Y+'좌표 = ('+m+'×'+y2+' + '+n+'×'+y1+') ÷ '+s+' = '+(m*y2+n*y1)+' ÷ '+s+' = <b>'+py+'</b>',
+      '따라서 <i>a</i> = '+a+' 이고 P(0, '+py+') 입니다.'
+    ]
+  };
+}
+
+/* ───── 4. 두 점 사이의 거리 ───── */
+const TRIPLE=[[3,4,5],[4,3,5],[6,8,10],[8,6,10],[5,12,13],[12,5,13],[9,12,15],[12,9,15]];
+function g_dist1(){
+  const t=pick(TRIPLE);
+  const dx=t[0]*pick([1,-1]), dy=t[1]*pick([1,-1]), d=t[2];
+  const x1=R(-6,6), y1=R(-6,6);
+  const x2=x1+dx, y2=y1+dy;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2]},
+    tag:'두 점 사이의 거리',
+    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 사이의 거리 <b>AB</b> 를 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    hint:'AB = '+sqh('('+X+'좌표의 차)² + ('+Y+'좌표의 차)²')+' — 피타고라스 정리 그대로입니다.',
+    fields:[{label:'거리 AB',ans:[String(d)]}],
+    sol:[
+      X+'좌표의 차 : '+x2+' − ('+x1+') = '+dx+' → 제곱하면 '+(dx*dx),
+      Y+'좌표의 차 : '+y2+' − ('+y1+') = '+dy+' → 제곱하면 '+(dy*dy),
+      'AB = '+sqh(dx*dx+' + '+dy*dy)+' = '+sqh(dx*dx+dy*dy)+' = <b>'+d+'</b>',
+      '(차를 제곱하므로 빼는 순서는 상관없습니다.)'
+    ]
+  };
+}
+function g_dist2(){
+  let x1,y1,x2,y2,a;
+  for(let i=0;i<400;i++){
+    x1=R(-6,6); y1=RZ(-6,6); x2=R(-6,6); y2=RZ(-6,6);
+    if(x1===x2) continue;
+    const num=(x2*x2+y2*y2)-(x1*x1+y1*y1), den=2*(x2-x1);
+    if(num%den!==0) continue;
+    a=num/den;
+    if(Math.abs(a)<=9) break;
+    a=undefined;
+  }
+  if(a===undefined) return g_dist1();
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2]},
+    tag:'축 위에서 같은 거리인 점',
+    q:'두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 에서 <b>같은 거리</b>에 있는 '+X+'축 위의 점 P 의 좌표를 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    hint:''+X+'축 위의 점은 '+Y+'좌표가 0 입니다. P(<i>a</i>, 0) 으로 놓고 <b>PA² = PB²</b> 로 식을 세웁니다. (제곱근은 양변에서 사라집니다.)',
+    fields:[{label:'P 의 '+X+'좌표',ans:[String(a)]},{label:'P 의 '+Y+'좌표',ans:['0']}],
+    sol:[
+      'P 가 '+X+'축 위의 점이므로 '+Y+'좌표는 0 입니다. P(<i>a</i>, 0) 이라 놓습니다.',
+      'PA² = (<i>a</i> − ('+x1+'))² + (0 − ('+y1+'))² = '+(x1===0?'<i>a</i>²':'(<i>a</i>'+sg(-x1)+')²')+' + '+(y1*y1),
+      'PB² = (<i>a</i> − ('+x2+'))² + (0 − ('+y2+'))² = '+(x2===0?'<i>a</i>²':'(<i>a</i>'+sg(-x2)+')²')+' + '+(y2*y2),
+      'PA = PB 이므로 PA² = PB². 전개하여 <i>a</i>² 를 지우면 '+(2*(x2-x1))+'<i>a</i> = '+((x2*x2+y2*y2)-(x1*x1+y1*y1))+' → <i>a</i> = <b>'+a+'</b>',
+      '따라서 P'+P(a,0)+' 입니다.'
+    ]
+  };
+}
+
+/* ───── 5. 직선의 방정식 ───── */
+function g_line1(){
+  const m=RZ(-4,4), x1=R(-5,5), y1=R(-6,6);
+  const n=y1-m*x1;
+  return {
+    _dbg:{m:m,pt:[x1,y1]},
+    tag:'기울기와 한 점으로 직선 구하기',
+    q:'기울기가 <b>'+m+'</b> 이고 점 '+P(x1,y1)+' 을 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
+    hint:'기울기가 <i>m</i> 이고 점 (<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>) 을 지나는 직선 : '+Y+' − <i>y</i><sub>1</sub> = <i>m</i>('+X+' − <i>x</i><sub>1</sub>)',
+    fields:[{label:'기울기 m',ans:[String(m)]},{label:''+Y+'절편 n',ans:[String(n)]}],
+    solFig: planeOf([[x1,y1],[0,n]],[{t:'line',a:m,b:-1,c:n},{t:'pt',x:x1,y:y1,label:'주어진 점'},{t:'pt',x:0,y:n,label:'n',color:'#e5484d'}]),
+    sol:[
+      '기울기는 문제에 주어진 그대로 <i>m</i> = <b>'+m+'</b> 입니다.',
+      ''+Y+' − ('+y1+') = '+m+'('+X+' − ('+x1+')) 에 넣고 정리합니다.',
+      ''+Y+' = '+term(m,X)+' '+(m*x1<0?'+ ':'− ')+Math.abs(m*x1)+' '+(y1<0?'− ':'+ ')+Math.abs(y1)+' → <b>'+lineMN(m,n)+'</b>',
+      '다른 방법 : '+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입하면 '+y1+' = '+(m*x1)+' + <i>n</i> → <i>n</i> = <b>'+n+'</b>'
+    ]
+  };
+}
+function g_line2(){
+  const m=RZ(-3,3), dx=pick([1,2,3,4]);
+  const x1=R(-5,3), y1=R(-6,6);
+  const x2=x1+dx, y2=y1+m*dx;
+  const n=y1-m*x1;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2]},
+    tag:'두 점을 지나는 직선',
+    q:'두 점 '+P(x1,y1)+' 와 '+P(x2,y2)+' 를 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    hint:'기울기 = <span class="fr"><span class="nu">Δ'+Y+'</span><span>Δ'+X+'</span></span> = <span class="fr"><span class="nu">'+Y+'좌표의 차</span><span>'+X+'좌표의 차</span></span> — 빼는 순서를 위아래가 같게 맞춰야 합니다.',
+    fields:[{label:'기울기 m',ans:[String(m)]},{label:''+Y+'절편 n',ans:[String(n)]}],
+    solFig: planeOf([[x1,y1],[x2,y2],[0,n]],[{t:'line',a:m,b:-1,c:n},{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
+    sol:[
+      '기울기 = ('+y2+' − ('+y1+')) ÷ ('+x2+' − ('+x1+')) = '+(y2-y1)+' ÷ '+dx+' = <b>'+m+'</b>',
+      ''+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입합니다.',
+      ''+y1+' = '+m+' × ('+x1+') + <i>n</i> = '+(m*x1)+' + <i>n</i> → <i>n</i> = <b>'+n+'</b>',
+      '따라서 직선의 방정식은 <b>'+lineMN(m,n)+'</b> 입니다.'
+    ]
+  };
+}
+
+/* ───── 6. 두 직선의 평행과 수직 ───── */
+function g_perp1(){
+  const m=RZ(-4,4), n=R(-5,5);
+  return {
+    _dbg:{m:m},
+    tag:'평행·수직인 직선의 기울기',
+    q:'직선 <b>'+lineMN(m,n)+'</b> 에 대하여, 이 직선과 <b>평행한</b> 직선의 기울기와 <b>수직인</b> 직선의 기울기를 각각 구하시오. (분수는 3/2 처럼 적습니다.)',
+    hint:'평행하면 기울기가 서로 <b>같고</b>, 수직이면 두 기울기의 <b>곱이 −1</b> 입니다.',
+    fields:[{label:'평행한 직선의 기울기',ans:[String(m)]},{label:'수직인 직선의 기울기',ans:[frs(-1,m)]}],
+    sol:[
+      '평행 → 기울기가 같습니다. 그대로 <b>'+m+'</b>',
+      '수직 → 기울기의 곱이 −1 입니다. '+m+' × <i>m</i>′ = −1 → <i>m</i>′ = '+frh(-1,m),
+      '즉 수직인 직선의 기울기는 <b>'+frs(-1,m)+'</b> (부호를 바꾸고 뒤집은 값) 입니다.'
+    ]
+  };
+}
+function g_perp2(){
+  const kind=pick(['평행','수직']);
+  const m=pick([-4,-3,-2,2,3,4]);
+  const n=R(-5,5);
+  let x1,y1,m2n,m2d,nn;
+  if(kind==='평행'){
+    x1=R(-5,5); y1=R(-6,6); m2n=m; m2d=1; nn=y1-m*x1;
+  }else{
+    /* 수직인 직선의 기울기는 −1/m. x좌표를 m 의 배수로 잡아야 y절편이 정수가 된다 */
+    const t=RZ(-3,3); x1=m*t; y1=R(-6,6); m2n=-1; m2d=m; nn=y1+t;
+  }
+  return {
+    _dbg:{kind:kind,m:m,pt:[x1,y1]},
+    tag:kind+'인 직선의 방정식',
+    q:'점 '+P(x1,y1)+' 을 지나고 직선 <b>'+lineMN(m,n)+'</b> 에 <b>'+kind+'</b>인 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오. (분수는 3/2 처럼 적습니다.)',
+    hint:'먼저 기울기를 정합니다 — 평행이면 <b>같은 기울기</b>, 수직이면 <b>곱해서 −1</b> 이 되는 기울기. 그다음 지나는 점을 대입해 '+Y+'절편을 구합니다.',
+    fields:[{label:'기울기 m',ans:[frs(m2n,m2d)]},{label:''+Y+'절편 n',ans:[String(nn)]}],
+    solFig: planeOf([[x1,y1],[0,nn],[0,n]],[{t:'line',a:m,b:-1,c:n,color:'#9aa4b2',dash:true},
+        {t:'line',a:m2n/m2d,b:-1,c:nn},{t:'pt',x:x1,y:y1,label:'지나는 점'}]),
+    sol:[
+      '주어진 직선의 기울기는 '+m+' 입니다.',
+      (kind==='평행'
+        ? '평행이므로 구하는 직선의 기울기도 <b>'+m+'</b> 입니다.'
+        : '수직이므로 기울기는 '+m+' 과 곱해서 −1 이 되는 수, 즉 <b>'+frs(-1,m)+'</b> 입니다.'),
+      ''+Y+' = '+(m2d===1?term(m2n,X):frh(m2n,m2d)+X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입하면 '
+        +y1+' = '+(m2n*x1/m2d)+' + <i>n</i> → <i>n</i> = <b>'+nn+'</b>',
+      '따라서 <b>'+lineMN(m2d===1?m2n:[m2n,m2d],nn)+'</b> 입니다.'
+    ]
+  };
+}
+
+/* ───── 7. 점과 직선 사이의 거리 ───── */
+function g_pd1(){
+  const ab=pick([[3,4],[4,3],[3,-4],[-3,4],[4,-3],[-4,3],[6,8],[8,6],[6,-8],[-8,6]]);
+  const a=ab[0], b=ab[1], hyp=Math.round(Math.sqrt(a*a+b*b));
+  const p=R(-3,3), q=R(-3,3);
+  const k=R(1,4);
+  const c=k*hyp-(a*p+b*q);
+  return {
+    _dbg:{pt:[p,q],L:[a,b,c]},
+    tag:'점과 직선 사이의 거리',
+    q:'점 '+P(p,q)+' 와 직선 <b>'+lineGen(a,b,c)+'</b> 사이의 거리를 구하시오.',
+    fig: planeOf([[p,q]],[{t:'line',a:a,b:b,c:c,color:'#9aa4b2'},{t:'pt',x:p,y:q,label:'P'}],2),
+    hint:'<i>d</i> = <span class="fr"><span class="nu">| 직선의 식에 '+X+', '+Y+' 좌표를 대입한 값 |</span><span>'+sqh('계수의 제곱의 합')+'</span></span> — 분모는 <i>a</i>²+<i>b</i>² 의 제곱근입니다.',
+    fields:[{label:'거리 d',ans:[String(k)]}],
+    sol:[
+      '분자 : | '+a+'×('+p+')'+(b<0?' − ':' + ')+Math.abs(b)+'×('+q+')'+sg(c)+' | = | '+(a*p)+sg(b*q)+sg(c)+' | = '+Math.abs(a*p+b*q+c),
+      '분모 : '+sqh('('+a+')² + ('+b+')²')+' = '+sqh(a*a+b*b)+' = '+hyp,
+      '<i>d</i> = '+Math.abs(a*p+b*q+c)+' ÷ '+hyp+' = <b>'+k+'</b>',
+      '절댓값을 씌우므로 거리는 항상 0 이상입니다.'
+    ]
+  };
+}
+function g_pd2(){
+  const mm=pick([[3,4],[-3,4],[4,3],[-4,3]]);
+  const mn=mm[0], md=mm[1];
+  let A=mn, B=-md;
+  const p=R(-3,3), q=R(-3,3);
+  const cand=[];
+  for(let t=-9;t<=9;t++){
+    const num=A*p+B*q+md*t;
+    if(num!==0 && num%5===0) cand.push(t);
+  }
+  const t=pick(cand);
+  const C=md*t;
+  const num=Math.abs(A*p+B*q+C), d=num/5;
+  return {
+    _dbg:{pt:[p,q],L:[A,B,C]},
+    tag:'기울기 꼴 직선과의 거리',
+    q:'점 '+P(p,q)+' 와 직선 <b>'+lineMN([mn,md],t)+'</b> 사이의 거리를 구하시오.',
+    fig: planeOf([[p,q]],[{t:'line',a:A,b:B,c:C,color:'#9aa4b2'},{t:'pt',x:p,y:q,label:'P'}],2),
+    hint:'거리 공식은 <b><i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴</b>에서만 쓸 수 있습니다. 먼저 이항하고 분모를 없애 정수 계수로 고치세요.',
+    fields:[{label:'거리 d',ans:[frs(num,5)]}],
+    sol:[
+      '먼저 <i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴로 고칩니다. 양변에 '+md+' 를 곱하면 '+md+Y+' = '+mn+X+sg(md*t),
+      '이항하여 <b>'+lineGen(A,B,C)+'</b>',
+      '분자 : | '+A+'×('+p+')'+(B<0?' − ':' + ')+Math.abs(B)+'×('+q+')'+sg(C)+' | = '+num,
+      '분모 : '+sqh('('+A+')² + ('+B+')²')+' = '+sqh(A*A+B*B)+' = 5',
+      '<i>d</i> = '+num+' ÷ 5 = <b>'+frs(num,5)+'</b>'
+    ]
+  };
+}
+
+/* ───── 8. 원의 방정식 (표준형) ───── */
+function stdEq(a,b,r2){ return sqx(X,a)+' + '+sqx(Y,b)+' = '+r2; }
+function genEq(D,E,F){
+  let s = X+'² + '+Y+'²';
+  s += sterm(D,X); s += sterm(E,Y);
+  if(F!==0) s += sg(F);
+  return s+' = 0';
+}
+function g_cir1(){
+  const a=R(-5,5), b=R(-5,5), r=R(1,6);
+  return {
+    _dbg:{eq:[a,b,r*r]},
+    tag:'표준형에서 중심·반지름 읽기',
+    q:'원 <b>'+stdEq(a,b,r*r)+'</b> 의 중심의 좌표와 반지름의 길이를 구하시오.',
+    hint:'중심이 (<i>a</i>, <i>b</i>) 이고 반지름이 <i>r</i> 인 원 : ('+X+' − <i>a</i>)² + ('+Y+' − <i>b</i>)² = <i>r</i>²  — <b>괄호 안의 부호는 반대로</b> 읽습니다.',
+    fields:[{label:'중심의 '+X+'좌표',ans:[String(a)]},{label:'중심의 '+Y+'좌표',ans:[String(b)]},{label:'반지름 r',ans:[String(r)]}],
+    solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
+    sol:[
+      sqx(X,a)+' 이므로 중심의 '+X+'좌표는 <b>'+a+'</b> 입니다. (괄호 안이 '+(a>=0?'− '+a:'+ '+Math.abs(a))+' 이면 '+a+')',
+      sqx(Y,b)+' 이므로 중심의 '+Y+'좌표는 <b>'+b+'</b> 입니다.',
+      '우변이 '+(r*r)+' = <i>r</i>² 이므로 반지름 <i>r</i> = '+sqh(r*r)+' = <b>'+r+'</b> 입니다.',
+      '우변은 반지름이 아니라 <b>반지름의 제곱</b>이라는 점을 꼭 기억하세요.'
+    ]
+  };
+}
+function g_cir2(){
+  const kind=pick(['원점','x축','y축']);
+  const a=RZ(-6,6), b=RZ(-6,6);
+  let r2, why;
+  if(kind==='원점'){ r2=a*a+b*b; why='원점 (0, 0) 을 지나므로 반지름 = 중심에서 원점까지의 거리입니다.'; }
+  else if(kind==='x축'){ r2=b*b; why=''+X+'축에 접하므로 반지름 = 중심에서 '+X+'축까지의 거리 = |중심의 '+Y+'좌표| 입니다.'; }
+  else { r2=a*a; why=''+Y+'축에 접하므로 반지름 = 중심에서 '+Y+'축까지의 거리 = |중심의 '+X+'좌표| 입니다.'; }
+  const r=Math.sqrt(r2);
+  const f=[{label:'우변의 값 (r²)',ans:[String(r2)]}];
+  if(Number.isInteger(r)) f.push({label:'반지름 r',ans:[String(r)]});
+  const cond = kind==='원점' ? '원점을 지나는 원' : kind+'에 접하는 원';
+  return {
+    _dbg:{kind:kind,ctr:[a,b]},
+    tag:cond,
+    q:'중심이 '+P(a,b)+' 이고 <b>'+cond+'</b> 의 방정식을 ('+X+' − <i>a</i>)² + ('+Y+' − <i>b</i>)² = <i>r</i>² 꼴로 나타낼 때, 우변의 값'+(Number.isInteger(r)?'과 반지름의 길이':'')+'을 구하시오.',
+    hint:'중심의 자리는 문제에 그대로 있습니다. 어려운 것은 <b>반지름</b> — '+(kind==='원점'?'중심에서 원점까지의 거리':'중심에서 그 축까지의 거리')+'를 재면 됩니다.',
+    fields:f,
+    solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
+    sol:[
+      why,
+      (kind==='원점'
+        ? '<i>r</i>² = ('+a+' − 0)² + ('+b+' − 0)² = '+(a*a)+' + '+(b*b)+' = <b>'+r2+'</b>'
+        : (kind==='x축'
+            ? '<i>r</i> = |'+b+'| = '+Math.abs(b)+' → <i>r</i>² = <b>'+r2+'</b>'
+            : '<i>r</i> = |'+a+'| = '+Math.abs(a)+' → <i>r</i>² = <b>'+r2+'</b>')),
+      '따라서 원의 방정식은 <b>'+stdEq(a,b,r2)+'</b> 입니다.'
+    ]
+  };
+}
+function g_cir3(){
+  let dx,dy,r;
+  if(Math.random()<0.5){ const s=pick([[6,8,5],[8,6,5],[6,-8,5],[-8,6,5]]); dx=s[0]; dy=s[1]; r=s[2]; }
+  else { r=R(2,5); if(Math.random()<0.5){ dx=2*r*pick([1,-1]); dy=0; } else { dx=0; dy=2*r*pick([1,-1]); } }
+  const x1=R(-5,5), y1=R(-5,5), x2=x1+dx, y2=y1+dy;
+  const cx=(x1+x2)/2, cy=(y1+y2)/2;
+  return {
+    _dbg:{A:[x1,y1],B:[x2,y2]},
+    tag:'지름의 양 끝점으로 원 구하기',
+    q:'두 점 A'+P(x1,y1)+' 와 B'+P(x2,y2)+' 가 <b>지름의 양 끝점</b>인 원의 중심의 좌표와 반지름을 구하시오.',
+    fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}],1),
+    hint:'지름의 <b>한가운데</b>가 중심이고, 반지름은 지름의 <b>절반</b>입니다. 중점 공식과 두 점 사이의 거리 공식을 차례로 씁니다.',
+    fields:[{label:'중심의 '+X+'좌표',ans:[String(cx)]},{label:'중심의 '+Y+'좌표',ans:[String(cy)]},{label:'반지름 r',ans:[String(r)]}],
+    solFig: planeOf([[cx-r,cy-r],[cx+r,cy+r]],[{t:'circle',cx:cx,cy:cy,r:r},
+          {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'},{t:'pt',x:cx,y:cy,label:'중심',color:'#e5484d'}],1),
+    sol:[
+      '중심 = 지름 AB 의 중점 : ( ('+x1+sg(x2)+') ÷ 2, ('+y1+sg(y2)+') ÷ 2 ) = <b>'+P(cx,cy)+'</b>',
+      '지름 AB = '+sqh('('+dx+')² + ('+dy+')²')+' = '+sqh(dx*dx+dy*dy)+' = '+(2*r),
+      '반지름 = 지름 ÷ 2 = '+(2*r)+' ÷ 2 = <b>'+r+'</b>',
+      '원의 방정식으로 쓰면 '+stdEq(cx,cy,r*r)+' 입니다.'
+    ]
+  };
+}
+
+/* ───── 9. 원의 방정식 (일반형 → 표준형) ───── */
+function g_gen1(){
+  const a=RZ(-5,5), b=RZ(-5,5), r=R(1,6);
+  const D=-2*a, E=-2*b, F=a*a+b*b-r*r;
+  return {
+    _dbg:{gen:[D,E,F]},
+    tag:'일반형에서 중심·반지름·넓이',
+    q:'원 <b>'+genEq(D,E,F)+'</b> 의 중심의 좌표와 반지름, 그리고 넓이를 구하시오. (넓이는 π 앞의 수만 적습니다.)',
+    hint:'<b>완전제곱식</b>으로 고칩니다. '+X+'² '+(D<0?'−':'+')+' '+Math.abs(D)+X+' 에서는 '+X+' 의 계수 '+D+' 의 <b>절반을 제곱한 값</b>을 양변에 더합니다.',
+    fields:[{label:'중심의 '+X+'좌표',ans:[String(a)]},{label:'중심의 '+Y+'좌표',ans:[String(b)]},
+            {label:'반지름 r',ans:[String(r)]},{label:'넓이 (π의 계수)',ans:[String(r*r)]}],
+    solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
+    sol:[
+      X+', '+Y+' 끼리 모읍니다 : ('+X+'²'+sterm(D,X)+') + ('+Y+'²'+sterm(E,Y)+') = '+(-F),
+      X+' 의 계수 '+D+' 의 절반은 '+(D/2)+', 제곱하면 '+(a*a)+' — 양변에 더합니다. '
+        +Y+' 의 계수 '+E+' 의 절반은 '+(E/2)+', 제곱하면 '+(b*b)+' — 이것도 양변에 더합니다.',
+      '('+X+'²'+sterm(D,X)+' + '+(a*a)+') + ('+Y+'²'+sterm(E,Y)+' + '+(b*b)+') = '+(-F)+' + '+(a*a)+' + '+(b*b)+' = '+(r*r),
+      '<b>'+stdEq(a,b,r*r)+'</b> → 중심 <b>'+P(a,b)+'</b>, 반지름 <b>'+r+'</b>',
+      '넓이 = π<i>r</i>² = <b>'+(r*r)+'</b>π'
+    ]
+  };
+}
+
+/* ───── 10. 원이 되는 조건 · 원의 넓이의 최댓값 ───── */
+function g_k1(){
+  const p=R(-4,4), q=R(-4,4);
+  const al=pick([1,2,3,-1,-2]);
+  const be=RZ(-10,10);
+  const right = term(al,'<i>k</i>') + (be!==0 ? sg(be) : '');
+  const bound = frs(-be,al);
+  return {
+    _dbg:{al:al,be:be},
+    tag:'원이 되기 위한 조건',
+    q:'방정식 <b>'+sqx(X,p)+' + '+sqx(Y,q)+' = '+right+'</b> 가 <b>원</b>을 나타내도록 하는 상수 <i>k</i> 의 값의 범위를 구하시오.',
+    hint:'우변은 <b>반지름의 제곱</b>입니다. 반지름은 길이이므로 제곱은 항상 <b>0보다 커야</b> 합니다. (0 이면 점 하나, 음수이면 그런 도형은 없습니다.)',
+    fields:[
+      {label:'부등호',type:'select',opts:['>','<'],ans:[al>0?'>':'<']},
+      {label:'k 의 경계값',ans:[bound]}
+    ],
+    sol:[
+      '우변 = <i>r</i>² 이고 원이 되려면 <i>r</i>² > 0 이어야 합니다.',
+      '따라서 '+right+' > 0',
+      (al>0
+        ? (al===1 ? '→ <i>k</i> > '+N(-be)
+                  : '→ '+term(al,'<i>k</i>')+' > '+N(-be)+' → <i>k</i> > '+frh(-be,al))
+        : '→ '+term(al,'<i>k</i>')+' > '+N(-be)+' — 음수로 나누므로 부등호가 <b>뒤집힙니다</b> → <i>k</i> < '+frh(-be,al)),
+      '답 : <b><i>k</i> '+(al>0?'&gt;':'&lt;')+' '+N(bound)+'</b>'
+    ]
+  };
+}
+function g_k2(){
+  const al=pick([1,2]), be=pick([1,2,3]);
+  const h=RZ(-3,3);
+  const K=pick([1,4,9,16]);
+  const ga=al*al+be*be+1, de=-2*h, ep=h*h-K;
+  const lo=h-R(1,3), hi=h+R(1,3);
+  let eq = X+'² + '+Y+'²';
+  eq += sterm(-2*al,'<i>a</i>'+X);
+  eq += sterm(2*be,'<i>a</i>'+Y);
+  eq += sterm(ga,'<i>a</i>²');
+  eq += sterm(de,'<i>a</i>');
+  if(ep!==0) eq += sg(ep);
+  eq += ' = 0';
+  const r=Math.sqrt(K);
+  return {
+    _dbg:{al:al,be:be,ga:ga,de:de,ep:ep},
+    tag:'원의 넓이의 최댓값',
+    q:'원 <b>'+eq+'</b> 의 넓이가 <b>최대</b>가 되도록 하는 <i>a</i> 의 값과, 그때의 반지름의 길이를 구하시오. (단, '+N(lo)+' &lt; <i>a</i> &lt; '+N(hi)+')',
+    hint:'넓이 π<i>r</i>² 가 최대 ⟺ <b><i>r</i>² 이 최대</b>. 먼저 완전제곱식으로 고쳐 <i>r</i>² 을 <i>a</i> 에 대한 이차식으로 나타낸 뒤, 다시 완전제곱꼴로 정리합니다.',
+    fields:[{label:'a 의 값',ans:[String(h)]},{label:'그때의 반지름',ans:[String(r)]}],
+    sol:[
+      X+' 부분 : '+X+'²'+sterm(-2*al,'<i>a</i>'+X)+' = ('+X+' − '+term(al,'<i>a</i>')+')² − '+term(al*al,'<i>a</i>²')+'  → 중심의 '+X+'좌표는 '+term(al,'<i>a</i>'),
+      Y+' 부분 : '+Y+'²'+sterm(2*be,'<i>a</i>'+Y)+' = ('+Y+' + '+term(be,'<i>a</i>')+')² − '+term(be*be,'<i>a</i>²')+'  → 중심의 '+Y+'좌표는 −'+term(be,'<i>a</i>'),
+      '<i>r</i>² = '+term(al*al,'<i>a</i>²')+' + '+term(be*be,'<i>a</i>²')+' − ('+ga+'<i>a</i>²'+sterm(de,'<i>a</i>')+(ep!==0?sg(ep):'')+') = −<i>a</i>²'+sterm(-de,'<i>a</i>')+(ep!==0?sg(-ep):''),
+      '완전제곱꼴로 : <i>r</i>² = −(<i>a</i>'+(h>0?' − ':' + ')+Math.abs(h)+')² + '+K,
+      '(<i>a</i>'+(h>0?' − ':' + ')+Math.abs(h)+')² 는 0 이상이므로, <i>a</i> = <b>'+N(h)+'</b> 일 때 <i>r</i>² 의 최댓값은 '+K+' 입니다. ('+N(lo)+' &lt; '+N(h)+' &lt; '+N(hi)+' 이므로 범위 안입니다.)',
+      '이때 반지름 <i>r</i> = '+sqh(K)+' = <b>'+r+'</b> (넓이는 '+(K===1?'':K)+'π)'
+    ]
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   주제 목록 — 새 주제를 넣으려면 이 배열에 한 칸 더 쓰면 됩니다.
+   ══════════════════════════════════════════════════════════════ */
+const TOPICS = [
+{ id:'mid', unit:1, unitName:'Ⅰ-1 평면좌표', name:'선분의 중점', pages:'자습 01차시',
+  desc:'양 끝점 좌표의 평균', gens:[g_mid1,g_mid2], concept:`
+  <div class="fx"><b>중점의 좌표 = 양 끝점 좌표의 평균</b><br>
+  두 점 A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>), B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>) 를 이은 선분 AB 의 중점 M 은
+  M ( <span class="fr"><span class="nu"><i>x</i><sub>1</sub> + <i>x</i><sub>2</sub></span><span>2</span></span>,
+      <span class="fr"><span class="nu"><i>y</i><sub>1</sub> + <i>y</i><sub>2</sub></span><span>2</span></span> )</div>
+  <p><span class="kw">왜 평균인가</span> 한가운데란 두 값의 딱 중간이라는 뜻입니다. 시험 점수 80점과 90점의 한가운데가 85점인 것과 똑같습니다.
+  <i>x</i> 끼리 평균, <i>y</i> 끼리 평균 — 이것이 전부입니다.</p>
+  <div class="warnbox">⚠ 자주 하는 실수 : 음수 좌표를 더할 때 부호를 빠뜨립니다.
+  (−3) + 5 = 2 이지 8 이 아닙니다. <b>괄호를 쓰고 더하는</b> 습관을 들이세요.</div>
+  ${planeOf([[-2,-3],[6,5]],[{t:'seg',x1:-2,y1:-3,x2:6,y2:5},
+     {t:'pt',x:-2,y:-3,label:'A(−2, −3)'},{t:'pt',x:6,y:5,label:'B(6, 5)'},
+     {t:'pt',x:2,y:1,label:'M(2, 1)',color:'#e5484d'}])}
+  <p class="muted">위 그림에서 M 의 <i>x</i>좌표 (−2+6)÷2 = 2, <i>y</i>좌표 (−3+5)÷2 = 1 입니다.</p>` },
+
+{ id:'cent', unit:1, unitName:'Ⅰ-1 평면좌표', name:'삼각형의 무게중심', pages:'자습 01차시',
+  desc:'세 꼭짓점 좌표의 평균', gens:[g_cent1,g_cent2], concept:`
+  <div class="fx"><b>무게중심의 좌표 = 세 꼭짓점 좌표의 평균</b><br>
+  삼각형 ABC 의 세 꼭짓점이 A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>), B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>), C(<i>x</i><sub>3</sub>, <i>y</i><sub>3</sub>) 이면
+  G ( <span class="fr"><span class="nu"><i>x</i><sub>1</sub> + <i>x</i><sub>2</sub> + <i>x</i><sub>3</sub></span><span>3</span></span>,
+      <span class="fr"><span class="nu"><i>y</i><sub>1</sub> + <i>y</i><sub>2</sub> + <i>y</i><sub>3</sub></span><span>3</span></span> )</div>
+  <p><span class="kw">중점과 한 세트</span> 중점은 2개의 평균, 무게중심은 3개의 평균. 나누는 수만 2 → 3 으로 바뀝니다.</p>
+  <p><span class="kw">왜 그런가</span> 무게중심 G 는 꼭짓점 A 와 마주보는 변 BC 의 중점 M 을 이은 선분 AM 을
+  <b>2 : 1 로 내분</b>하는 점입니다. 이 성질을 내분점 공식에 넣고 정리하면 위의 평균 공식이 나옵니다.
+  자습지에 나오는 &ldquo;M 은 BC 의 1 : 1 내분점(중점), G 는 AM 의 2 : 1 내분점&rdquo; 이 바로 이 이야기입니다.</p>
+  ${planeOf([[-2,-3],[6,-2],[4,8]],[
+     {t:'seg',x1:-2,y1:-3,x2:6,y2:-2},{t:'seg',x1:6,y1:-2,x2:4,y2:8},{t:'seg',x1:4,y1:8,x2:-2,y2:-3},
+     {t:'seg',x1:4,y1:8,x2:2,y2:-2.5,dash:true,color:'#9aa4b2'},
+     {t:'pt',x:-2,y:-3,label:'A'},{t:'pt',x:6,y:-2,label:'B'},{t:'pt',x:4,y:8,label:'C'},
+     {t:'pt',x:2,y:-2.5,label:'M',color:'#9aa4b2'},
+     {t:'pt',x:8/3,y:1,label:'G',color:'#e5484d'}])}
+  <div class="warnbox">⚠ 세 좌표의 합이 3 으로 나누어떨어지지 않으면 답이 분수가 됩니다. 분수 답도 정답입니다 —
+  이 도구에서는 <b>3/2</b> 처럼 적으면 됩니다.</div>` },
+
+{ id:'div', unit:1, unitName:'Ⅰ-1 평면좌표', name:'선분의 내분점', pages:'자습 02차시',
+  desc:'m : n 으로 나누는 점', gens:[g_div1,g_div2], concept:`
+  <div class="fx"><b>내분점 공식</b><br>
+  A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>), B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>) 에 대하여 선분 AB 를 <i>m</i> : <i>n</i> 으로 내분하는 점 P 는
+  P ( <span class="fr"><span class="nu"><i>mx</i><sub>2</sub> + <i>nx</i><sub>1</sub></span><span><i>m</i> + <i>n</i></span></span>,
+      <span class="fr"><span class="nu"><i>my</i><sub>2</sub> + <i>ny</i><sub>1</sub></span><span><i>m</i> + <i>n</i></span></span> )</div>
+  <p><span class="kw">외우는 요령</span> <b>앞의 수 <i>m</i> 은 뒤의 점 B 에 곱한다.</b> 이것만 틀리지 않으면 됩니다.
+  (A 에서 출발해 <i>m</i> 만큼 갔다는 뜻이니, B 쪽으로 <i>m</i> 만큼 끌려간다고 생각하세요.)</p>
+  <p><span class="kw">확인법</span> <i>m</i> : <i>n</i> = 1 : 1 을 넣어 보면 (<i>x</i><sub>1</sub>+<i>x</i><sub>2</sub>)/2 — 중점 공식이 그대로 나옵니다.
+  공식을 잘못 외웠는지 늘 이렇게 점검할 수 있습니다.</p>
+  ${planeOf([[0,0],[9,6]],[{t:'seg',x1:0,y1:0,x2:9,y2:6},
+     {t:'pt',x:0,y:0,label:'A(0, 0)'},{t:'pt',x:9,y:6,label:'B(9, 6)'},
+     {t:'pt',x:3,y:2,label:'1:2',color:'#e5484d'},{t:'pt',x:6,y:4,label:'2:1',color:'#12a150'}])}
+  <p class="muted">1 : 2 로 내분하면 A 에 가깝고, 2 : 1 로 내분하면 B 에 가깝습니다.
+  <b>앞의 수가 클수록 B 쪽</b>입니다.</p>
+  <div class="warnbox">⚠ 내분점이 <i>y</i>축 위에 있다 → <i>x</i>좌표가 <b>0</b>.
+  <i>x</i>축 위에 있다 → <i>y</i>좌표가 <b>0</b>. 이 한 줄이 문제 푸는 열쇠입니다.</div>` },
+
+{ id:'dist', unit:1, unitName:'Ⅰ-1 평면좌표', name:'두 점 사이의 거리', pages:'자습 03차시',
+  desc:'피타고라스 정리 그대로', gens:[g_dist1,g_dist2], concept:`
+  <div class="fx"><b>두 점 사이의 거리</b><br>
+  수직선 위 : AB = |<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>|<br>
+  좌표평면 위 : AB = ${sqh('(<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>)² + (<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>)²')}
+  = ${sqh('(<i>x</i>좌표의 차)² + (<i>y</i>좌표의 차)²')}</div>
+  <p><span class="kw">피타고라스 정리</span> 두 점을 잇고 직각삼각형을 그리면 밑변은 <i>x</i>좌표의 차, 높이는 <i>y</i>좌표의 차입니다.
+  빗변이 곧 두 점 사이의 거리이므로 (밑변)² + (높이)² = (빗변)² 입니다.</p>
+  ${planeOf([[1,-1],[5,2]],[{t:'seg',x1:1,y1:-1,x2:5,y2:2},
+     {t:'seg',x1:1,y1:-1,x2:5,y2:-1,dash:true,color:'#9aa4b2'},
+     {t:'seg',x1:5,y1:-1,x2:5,y2:2,dash:true,color:'#9aa4b2'},
+     {t:'pt',x:1,y:-1,label:'A(1, −1)'},{t:'pt',x:5,y:2,label:'B(5, 2)'}])}
+  <p class="muted">가로 4, 세로 3 → AB = ${sqh('4² + 3²')} = ${sqh('25')} = 5.</p>
+  <p><span class="kw">삼각형의 모양 판별</span> 세 변의 길이를 모두 구한 뒤
+  가장 긴 변의 제곱이 나머지 두 변의 제곱의 합과 같으면 <b>직각삼각형</b>,
+  두 변의 길이가 같으면 <b>이등변삼각형</b> 입니다.</p>
+  <div class="warnbox">⚠ 어느 쪽에서 빼든 제곱하면 같습니다. 부호 때문에 헷갈릴 필요가 없습니다.<br>
+  ⚠ &ldquo;같은 거리에 있는 점&rdquo; 문제는 제곱근을 그대로 두지 말고 <b>양변을 제곱</b>해서 풉니다.</div>` },
+
+{ id:'line', unit:2, unitName:'Ⅰ-2 직선의 방정식', name:'직선의 방정식', pages:'자습 04차시',
+  desc:'기울기와 절편으로 세우기', gens:[g_line1,g_line2], concept:`
+  <div class="fx"><b>직선의 방정식 세 가지 모양</b><br>
+  ① 기울기 <i>m</i>, ${Y}절편 <i>n</i> : ${Y} = <i>mx</i> + <i>n</i><br>
+  ② 기울기 <i>m</i>, 점 (<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>) 을 지남 : ${Y} − <i>y</i><sub>1</sub> = <i>m</i>(${X} − <i>x</i><sub>1</sub>)<br>
+  ③ 두 점을 지남 : 기울기 = <span class="fr"><span class="nu"><i>y</i><sub>2</sub> − <i>y</i><sub>1</sub></span><span><i>x</i><sub>2</sub> − <i>x</i><sub>1</sub></span></span> 를 구한 뒤 ②를 씀</div>
+  <p><span class="kw">기울기란</span> <span class="fr"><span class="nu">Δ${Y}</span><span>Δ${X}</span></span> =
+  <span class="fr"><span class="nu">세로로 간 칸</span><span>가로로 간 칸</span></span>.
+  오른쪽으로 1칸 갈 때 위로 몇 칸 오르는가를 나타냅니다. 기울기가 음수면 내려갑니다.</p>
+  <p><span class="kw">${Y}절편이란</span> 직선이 ${Y}축과 만나는 점의 ${Y}좌표. 즉 ${X} = 0 일 때의 ${Y}값입니다.</p>
+  ${planeOf([[-1,-2],[4,5]],[{t:'line',a:2,b:-1,c:1},
+     {t:'pt',x:0,y:1,label:'y절편 1',color:'#e5484d'},{t:'pt',x:1,y:3,label:'',color:'#2563eb'}])}
+  <p class="muted">위는 ${Y} = 2${X} + 1. 오른쪽 1칸마다 위로 2칸 오릅니다.</p>
+  <div class="warnbox">⚠ 기울기를 구할 때 위아래 <b>빼는 순서를 같게</b> 맞추세요.
+  (<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>) ÷ (<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>) 이지,
+  (<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>) ÷ (<i>x</i><sub>1</sub> − <i>x</i><sub>2</sub>) 가 아닙니다. 부호가 반대가 됩니다.</div>` },
+
+{ id:'perp', unit:2, unitName:'Ⅰ-2 직선의 방정식', name:'두 직선의 평행과 수직', pages:'자습 04차시',
+  desc:'기울기가 같다 / 곱이 −1', gens:[g_perp1,g_perp2], concept:`
+  <div class="fx"><b>두 직선 ${Y} = <i>mx</i> + <i>n</i> 과 ${Y} = <i>m</i>′${X} + <i>n</i>′ 에 대하여</b><br>
+  평행 ⟺ <i>m</i> = <i>m</i>′ (기울기가 같고 ${Y}절편은 다름)<br>
+  수직 ⟺ <i>m</i> × <i>m</i>′ = −1 &nbsp;→&nbsp; <i>m</i>′ = − <span class="fr"><span class="nu">1</span><span><i>m</i></span></span></div>
+  <p><span class="kw">수직 기울기 만드는 법</span> <b>부호를 바꾸고 뒤집는다.</b>
+  2 → −1/2, −3 → 1/3, 3/4 → −4/3.</p>
+  ${planeOf([[-4,-4],[4,4]],[
+     {t:'line',a:2,b:-1,c:1,color:'#2563eb'},
+     {t:'line',a:2,b:-1,c:-3,color:'#12a150',dash:true},
+     {t:'line',a:-0.5,b:-1,c:1,color:'#e5484d'}])}
+  <p class="muted">파랑 ${Y} = 2${X} + 1 과 초록 ${Y} = 2${X} − 3 은 <b>평행</b>(기울기 둘 다 2),
+  빨강 ${Y} = −½${X} + 1 은 파랑과 <b>수직</b>(2 × (−½) = −1).</p>
+  <div class="warnbox">⚠ 기울기가 같은데 ${Y}절편까지 같으면 평행이 아니라 <b>같은 직선</b>입니다.</div>` },
+
+{ id:'pd', unit:2, unitName:'Ⅰ-2 직선의 방정식', name:'점과 직선 사이의 거리', pages:'자습 05차시',
+  desc:'대입하고 절댓값, 계수 제곱합의 제곱근으로 나누기', gens:[g_pd1,g_pd2], concept:`
+  <div class="fx"><b>점과 직선 사이의 거리</b><br>
+  점 (<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>) 과 직선 <i>ax</i> + <i>by</i> + <i>c</i> = 0 사이의 거리
+  <i>d</i> = <span class="fr"><span class="nu">| <i>ax</i><sub>1</sub> + <i>by</i><sub>1</sub> + <i>c</i> |</span><span>${sqh('<i>a</i>² + <i>b</i>²')}</span></span></div>
+  <p><span class="kw">읽는 법</span> 분자는 <b>직선의 식에 점의 좌표를 그대로 대입</b>하고 절댓값을 씌운 것,
+  분모는 <b>${X}, ${Y} 의 계수를 제곱해서 더한 뒤 제곱근</b>을 씌운 것입니다. <i>c</i> 는 분모에 넣지 않습니다.</p>
+  <div class="fx">두 가지 모양, 두 가지 쓸모<br>
+  ‣ ${Y} = <i>mx</i> + <i>n</i> 꼴 → <b>기울기</b>와 <b>${Y}절편</b>을 한눈에 봄<br>
+  ‣ <i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴 → <b>점과 직선 사이의 거리</b>를 계산할 때 씀</div>
+  <p><span class="kw">고치는 순서</span> ① 모두 좌변으로 이항 ② 분수가 있으면 분모의 최소공배수를 곱해 정수로.
+  예) ${Y} = −<span class="fr"><span class="nu">4</span><span>3</span></span>${X} + 4 → 3${Y} = −4${X} + 12 → 4${X} + 3${Y} − 12 = 0</p>
+  ${planeOf([[-1,-1],[6,5]],[{t:'line',a:3,b:-4,c:2,color:'#9aa4b2'},{t:'pt',x:2,y:-3,label:'P(2, −3)'}],2)}
+  <p class="muted">점 (2, −3) 과 직선 3${X} − 4${Y} + 2 = 0 사이의 거리 =
+  |3·2 − 4·(−3) + 2| ÷ ${sqh('3² + 4²')} = 20 ÷ 5 = 4.</p>
+  <div class="warnbox">⚠ 분모는 ${sqh('<i>a</i>² + <i>b</i>²')} 입니다. <i>c</i> 를 함께 제곱해 넣는 실수가 가장 많습니다.</div>` },
+
+{ id:'cir', unit:3, unitName:'Ⅰ-3 원의 방정식', name:'원의 방정식 (표준형)', pages:'자습 06차시',
+  desc:'중심과 반지름으로 바로 쓰기', gens:[g_cir1,g_cir2,g_cir3], concept:`
+  <div class="fx"><b>원의 방정식 (표준형)</b><br>
+  중심이 (<i>a</i>, <i>b</i>) 이고 반지름이 <i>r</i> 인 원 :
+  (${X} − <i>a</i>)² + (${Y} − <i>b</i>)² = <i>r</i>²<br>
+  특히 중심이 원점이면 ${X}² + ${Y}² = <i>r</i>²</div>
+  <p><span class="kw">왜 이렇게 생겼나</span> 원은 <b>중심에서 거리가 같은 점들의 모임</b>입니다.
+  중심 (<i>a</i>, <i>b</i>) 에서 점 (${X}, ${Y}) 까지의 거리가 <i>r</i> 이라는 말을 두 점 사이의 거리 공식으로 쓰면
+  ${sqh('(' + X + ' − <i>a</i>)² + (' + Y + ' − <i>b</i>)²')} = <i>r</i>, 양변을 제곱하면 위 식입니다.</p>
+  <table class="kv"><tr><th>조건</th><th>반지름 구하는 법</th></tr>
+  <tr><td>원점을 지난다</td><td>중심에서 원점까지의 거리</td></tr>
+  <tr><td>${X}축에 접한다</td><td>|중심의 ${Y}좌표|</td></tr>
+  <tr><td>${Y}축에 접한다</td><td>|중심의 ${X}좌표|</td></tr>
+  <tr><td>두 점이 지름의 양 끝</td><td>중심 = 두 점의 중점, 반지름 = 두 점 사이 거리 ÷ 2</td></tr></table>
+  ${planeOf([[2,-1],[8,5]],[{t:'circle',cx:5,cy:2,r:3},{t:'pt',x:5,y:2,label:'중심(5, 2)',color:'#e5484d'}],1)}
+  <p class="muted">위 원은 (${X} − 5)² + (${Y} − 2)² = 9.</p>
+  <div class="warnbox">⚠ 괄호 안의 부호는 <b>반대로</b> 읽습니다. (${X} + 4)² 이면 중심의 ${X}좌표는 −4 입니다.<br>
+  ⚠ 우변은 반지름이 아니라 <b>반지름의 제곱</b>입니다.</div>` },
+
+{ id:'gen', unit:3, unitName:'Ⅰ-3 원의 방정식', name:'일반형 → 중심·반지름·넓이', pages:'자습 07차시',
+  desc:'완전제곱식으로 고치기', gens:[g_gen1], concept:`
+  <div class="fx"><b>완전제곱식</b><br>
+  ${X}² − 2<i>a</i>${X} + <i>a</i>² = (${X} − <i>a</i>)² &nbsp;&nbsp;/&nbsp;&nbsp; ${X}² + 2<i>b</i>${X} + <i>b</i>² = (${X} + <i>b</i>)²<br>
+  → ${X} 의 계수의 <b>절반을 제곱</b>한 값을 더하면 완전제곱식이 됩니다.</div>
+  <p><span class="kw">일반형에서 중심·반지름 찾기</span></p>
+  <div class="explain"><ol>
+  <li>${X} 끼리, ${Y} 끼리 묶고 상수항은 우변으로 넘긴다.</li>
+  <li>${X} 의 계수의 절반의 제곱, ${Y} 의 계수의 절반의 제곱을 <b>양변에</b> 더한다.</li>
+  <li>좌변을 (${X} − <i>a</i>)² + (${Y} − <i>b</i>)² 로 묶으면 우변이 <i>r</i>² 이다.</li>
+  </ol></div>
+  <p>예) ${X}² + ${Y}² − 4${X} + 6${Y} − 3 = 0<br>
+  → (${X}² − 4${X} + <b>4</b>) + (${Y}² + 6${Y} + <b>9</b>) = 3 + <b>4</b> + <b>9</b><br>
+  → (${X} − 2)² + (${Y} + 3)² = 16 → 중심 (2, −3), 반지름 4</p>
+  <div class="fx"><b>원의 넓이 = π<i>r</i>²</b> — 반지름의 제곱에 π 를 곱합니다. 반지름을 구하면 끝입니다.</div>
+  <div class="warnbox">⚠ 양변에 더해야 합니다. 좌변에만 더하면 식이 달라집니다.<br>
+  ⚠ 부호 : (${Y} + 3)² 이면 중심의 ${Y}좌표는 −3 입니다.</div>` },
+
+{ id:'kmax', unit:3, unitName:'Ⅰ-3 원의 방정식', name:'원이 될 조건 · 넓이의 최댓값', pages:'자습 08차시',
+  desc:'r² > 0, 그리고 r² 의 최댓값', gens:[g_k1,g_k2], concept:`
+  <div class="fx"><b>원이 되기 위한 조건 : (우변) = <i>r</i>² &gt; 0</b><br>
+  반지름은 길이이므로 <i>r</i> &gt; 0, 따라서 <i>r</i>² 도 0 보다 커야 합니다.<br>
+  우변 = 0 → 점 하나 / 우변 &lt; 0 → 그런 도형은 없음</div>
+  <p>예) ${X}² + ${Y}² = 25 는 반지름 5 인 원이지만, ${X}² + ${Y}² = −25 를 만족하는 점은 <b>하나도 없습니다</b>.
+  제곱을 더한 값이 음수가 될 수는 없기 때문입니다.</p>
+  <div class="warnbox">⚠ 부등식을 정리할 때 <b>음수로 나누면 부등호가 뒤집힙니다</b>. −2<i>k</i> + 6 &gt; 0 → <i>k</i> &lt; 3.</div>
+  <div class="fx"><b>넓이의 최댓값</b><br>
+  넓이 = π<i>r</i>² 이므로 <b>넓이가 최대 ⟺ <i>r</i>² 이 최대</b>. <i>r</i>² 을 문자에 대한 이차식으로 나타낸 뒤
+  완전제곱꼴로 고쳐 최댓값을 찾습니다.</div>
+  <p><span class="kw">이차식의 최대·최소</span></p>
+  <table class="kv">
+  <tr><th>모양</th><th>언제</th><th>값</th></tr>
+  <tr><td>(<i>a</i> − 3)² + 1</td><td><i>a</i> = 3</td><td>최솟값 1 (제곱은 0 이상이므로)</td></tr>
+  <tr><td>−(<i>a</i> + 2)² + 3</td><td><i>a</i> = −2</td><td>최댓값 3 (앞에 − 가 붙었으므로)</td></tr>
+  </table>
+  <p class="muted">−( )² 꼴은 괄호가 0 일 때 가장 커집니다. 여기서 &ldquo;가장 큰 <i>r</i>²&rdquo; 이 나옵니다.</p>` }
+];
+
+/* ══════════════ 여기부터는 대개 손대지 않습니다 ══════════════ */
+
+const CFG = { practiceN:8, examN:20, storeKey:'math-dohyeong-master_v1' };
+
+const ST = (function(){
+  try{ const s=JSON.parse(localStorage.getItem(CFG.storeKey)); if(s && s.wrong) return s; }catch(e){}
+  return { wrong:[], best:{} };
+})();
+function save(){ try{ localStorage.setItem(CFG.storeKey, JSON.stringify(ST)); }catch(e){} }
+
+const topicById = id => TOPICS.filter(function(t){ return t.id===id; })[0];
+function newProblem(topic){
+  const g = pick(topic.gens);
+  const p = g();
+  p.topicId = topic.id; p.topicName = topic.name; p.unit = topic.unit;
+  return p;
+}
+function pillOf(t){ return '<span class="pill u'+t.unit+'">'+t.unitName+'</span>'; }
+
+/* ───────── 화면 전환 ───────── */
+let VIEW='learn';
+document.querySelectorAll('.tab').forEach(function(b){
+  b.onclick = function(){ render(b.dataset.view); };
+});
+function render(v){
+  VIEW=v; SESSION=null;
+  document.querySelectorAll('.tab').forEach(function(b){ b.classList.toggle('on', b.dataset.view===v); });
+  const box=$('#view'); box.innerHTML='';
+  if(v==='learn')    renderLearnList(box);
+  if(v==='practice') renderPracticePick(box);
+  if(v==='exam')     renderExamIntro(box);
+  if(v==='wrong')    renderWrong(box);
+  fixMinus(box);
+  window.scrollTo(0,0);
+}
+
+/* ───────── 📖 배우기 ───────── */
+function renderLearnList(box){
+  box.appendChild(el('<div class="card"><h3>📖 배우기 — 개념을 먼저 봅니다</h3>'
+    +'<div class="muted">주제를 고르면 공식과 그림, 그리고 <b>풀이가 전부 보이는 예제</b>가 나옵니다. '
+    +'예제는 누를 때마다 숫자가 바뀌니 여러 번 보고 나서 연습으로 넘어가세요.</div></div>'));
+  let cur=0;
+  TOPICS.forEach(function(t,i){
+    if(t.unit!==cur){ cur=t.unit; box.appendChild(el('<div style="margin:16px 0 8px;font-weight:800">'+t.unitName+'</div>')); }
+    const best = ST.best[t.id];
+    const b = el('<button class="titem">'+pillOf(t)
+      +'<b>'+(i+1)+'. '+t.name+'</b><div class="d">'+t.desc+' · '+t.pages
+      +(best!==undefined?' · <span class="done">연습 최고 '+best+'점</span>':'')+'</div></button>');
+    b.onclick = function(){ renderLearnOne(t); };
+    let grid = box.lastElementChild;
+    if(!grid || !grid.classList.contains('tlist')){ grid=el('<div class="tlist"></div>'); box.appendChild(grid); }
+    grid.appendChild(b);
+  });
+}
+function renderLearnOne(t){
+  const box=$('#view'); box.innerHTML='';
+  const back=el('<button class="btn btn-ghost">← 주제 목록</button>');
+  back.onclick=function(){ render('learn'); };
+  box.appendChild(back);
+  box.appendChild(el('<div class="card" style="margin-top:10px">'+pillOf(t)
+    +'<h3 style="margin-top:6px">'+t.name+'</h3>'+t.concept+'</div>'));
+
+  const ex=el('<div class="card"><h3>✅ 예제 — 풀이를 다 보여 줍니다</h3><div id="exBody"></div>'
+    +'<div class="row" style="margin-top:12px">'
+    +'<button class="btn" id="exNew">🎲 다른 예제 보기</button>'
+    +'<button class="btn btn-primary" id="exGo">✏️ 이 주제 연습하기 ('+CFG.practiceN+'문항)</button></div></div>');
+  box.appendChild(ex);
+  function drawEx(){
+    const p=newProblem(t);
+    $('#exBody').innerHTML =
+        '<div class="qtext">'+p.q+'</div>'
+      + (p.fig||'')
+      + '<div class="explain"><b>풀이</b><ol>'+p.sol.map(function(s){ return '<li>'+s+'</li>'; }).join('')+'</ol></div>'
+      + (p.solFig||'')
+      + '<div style="margin-top:10px;font-weight:800;color:var(--ok)">정답 &nbsp;'
+      + p.fields.map(function(f){ return f.label+' = '+esc2(f.ans[0]); }).join(' &nbsp;/&nbsp; ')+'</div>';
+  }
+  $('#exNew').onclick=function(){ drawEx(); fixMinus($('#exBody')); };
+  $('#exGo').onclick=function(){ render('practice'); startSession({mode:'practice',topics:[t],n:CFG.practiceN,part:t.name}); };
+  drawEx();
+  fixMinus(box);
+  window.scrollTo(0,0);
+}
+
+/* ───────── ✏️ 연습 — 주제 고르기 ───────── */
+function renderPracticePick(box){
+  box.appendChild(el('<div class="card"><h3>✏️ 연습 '+CFG.practiceN+'문항</h3>'
+    +'<div class="muted">한 문제씩 풀고 <b>바로 해설</b>을 봅니다. 채점은 문제당 한 번뿐이니 천천히 확인하고 누르세요.</div></div>'));
+  const all=el('<div class="card"><button class="btn btn-primary" id="mixAll" style="width:100%">🎲 전체 섞어서 연습하기</button></div>');
+  box.appendChild(all);
+  $('#mixAll').onclick=function(){ startSession({mode:'practice',topics:TOPICS,n:CFG.practiceN,part:'전체 섞기'}); };
+  let cur=0;
+  TOPICS.forEach(function(t,i){
+    if(t.unit!==cur){ cur=t.unit; box.appendChild(el('<div style="margin:16px 0 8px;font-weight:800">'+t.unitName+'</div>')); }
+    const b=el('<button class="titem"><b>'+(i+1)+'. '+t.name+'</b><div class="d">'+t.desc+'</div></button>');
+    b.onclick=function(){ startSession({mode:'practice',topics:[t],n:CFG.practiceN,part:t.name}); };
+    let grid=box.lastElementChild;
+    if(!grid || !grid.classList.contains('tlist')){ grid=el('<div class="tlist"></div>'); box.appendChild(grid); }
+    grid.appendChild(b);
+  });
+}
+
+/* ───────── 🏁 종합시험 ───────── */
+function renderExamIntro(box){
+  box.appendChild(el('<div class="card"><h3>🏁 종합시험 '+CFG.examN+'문항</h3>'
+    +'<div class="muted">10개 주제에서 골고루 나옵니다. <b>푸는 동안에는 정답도 점수도 보이지 않습니다.</b> '
+    +'끝나면 오답노트가 나오고, 선생님께 결과를 제출할 수 있습니다.</div>'
+    +'<div class="row" style="margin-top:12px"><button class="btn btn-primary" id="examGo">시험 시작</button></div></div>'));
+  $('#examGo').onclick=function(){ startSession({mode:'exam',topics:TOPICS,n:CFG.examN,part:'종합시험'}); };
+}
+
+/* ───────── 문제 풀이 진행 ───────── */
+let SESSION=null;
+function startSession(o){
+  const list=[]; let guard=0;
+  const pool = o.topics.length>1 ? shuffle(o.topics.slice()) : o.topics;
+  while(list.length<o.n && guard++<600){
+    const t = pool[list.length % pool.length];
+    const p = newProblem(t);
+    if(list.length && list[list.length-1].tag===p.tag && Math.random()<0.7) continue;
+    list.push(p);
+  }
+  SESSION={ mode:o.mode, part:o.part, list:list, i:0, correct:0, combo:0, bestCombo:0,
+            t0:Date.now(), wrong:[], graded:false };
+  drawQ();
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+/* 화면에 답을 적을 때 — 부등호는 escape, 음수는 − 로 */
+function esc2(s){ return esc(N(s)); }
+/* 화면에 찍힌 -3 같은 음수를 −3 으로. 글자 마디만 고치므로 SVG 좌표는 안전하다 */
+function fixMinus(root){
+  if(!root) return;
+  const w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const hit=[];
+  while(w.nextNode()){ if(/-\d/.test(w.currentNode.nodeValue)) hit.push(w.currentNode); }
+  hit.forEach(function(n){ n.nodeValue = n.nodeValue.replace(/-(?=\d)/g,'−'); });
+}
+
+function drawQ(){
+  const S=SESSION, p=S.list[S.i], box=$('#view');
+  box.innerHTML='';
+  const isEx = S.mode==='exam';
+  const head = el('<div class="card">'
+    +'<div class="row" style="justify-content:space-between">'
+      +'<span class="qnum">'+(isEx?'🏁 종합시험':'✏️ 연습 · '+S.part)+' &nbsp; '+(S.i+1)+' / '+S.list.length+'</span>'
+      +'<span class="qnum">'+(isEx?'채점은 마지막에':'맞힌 개수 '+S.correct+' &nbsp;<span class="combo">'+(S.combo>1?'🔥 '+S.combo+'연속':'')+'</span>')+'</span>'
+    +'</div>'
+    +'<div class="progress"><i style="width:'+(S.i/S.list.length*100)+'%"></i></div>'
+    +'<div class="qtext">'+p.q+'</div>'
+    +(p.fig||'')
+    +'<div class="fields" id="flds"></div>'
+    +'<div id="hintBox"></div>'
+    +'<div class="row" style="margin-top:12px" id="btns"></div>'
+    +'<div id="after"></div>'
+    +'</div>');
+  box.appendChild(head);
+
+  const fl=$('#flds');
+  p.fields.forEach(function(f,idx){
+    let inner;
+    if(f.type==='select'){
+      inner='<select data-fi="'+idx+'"><option value=""></option>'
+        +f.opts.map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('')+'</select>';
+    } else {
+      inner='<input data-fi="'+idx+'" type="text" inputmode="text" autocomplete="off" placeholder="숫자 또는 3/2">';
+    }
+    fl.appendChild(el('<div class="fld" id="fld'+idx+'"><label>'+f.label+'</label>'+inner+'</div>'));
+  });
+
+  const btns=$('#btns');
+  if(!isEx && p.hint){
+    const hb=el('<button class="btn">💡 힌트</button>');
+    hb.onclick=function(){ $('#hintBox').innerHTML='<div class="explain">'+p.hint+'</div>'; hb.disabled=true; };
+    btns.appendChild(hb);
+  }
+  const go=el('<button class="btn btn-primary">'+(isEx?(S.i+1===S.list.length?'답안 제출하고 채점':'다음 문제 →'):'정답 확인')+'</button>');
+  go.onclick=submit;
+  btns.appendChild(go);
+  if(isEx){
+    const sk=el('<span class="muted">모르면 비워 두고 넘어가도 됩니다.</span>');
+    btns.appendChild(sk);
+  }
+  fixMinus(head);
+  const first=document.querySelector('[data-fi]');
+  if(first) first.focus();
+  document.querySelectorAll('[data-fi]').forEach(function(inp){
+    inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); go.click(); } });
+  });
+  window.scrollTo(0,0);
+
+  function submit(){
+    const got=[]; let ok=true;
+    p.fields.forEach(function(f,idx){
+      const inp=document.querySelector('[data-fi="'+idx+'"]');
+      const v=inp?inp.value:'';
+      got.push(v);
+      const good=f.ans.some(function(a){ return same(v,a); });
+      if(!good) ok=false;
+      if(!isEx) $('#fld'+idx).classList.add(good?'good':'bad');
+    });
+    const myText = p.fields.map(function(f,i){ return f.label+' = '+(String(got[i]).trim()?esc2(String(got[i]).trim()):'(빈칸)'); }).join(' / ');
+    const ansText= p.fields.map(function(f){ return f.label+' = '+esc2(f.ans[0]); }).join(' / ');
+    if(ok){ S.correct++; S.combo++; S.bestCombo=Math.max(S.bestCombo,S.combo); }
+    else {
+      S.combo=0;
+      S.wrong.push({ no:S.i+1, topicName:p.topicName, tag:p.tag, q:p.q, fig:p.fig||'',
+                     solFig:p.solFig||'', sol:p.sol, my:myText, ans:ansText });
+    }
+    if(isEx){ next(); return; }
+
+    document.querySelectorAll('[data-fi]').forEach(function(i){ i.disabled=true; });
+    go.disabled=true;
+    if(ok && window.FX){ try{ FX.burst(go); FX.punch(go); }catch(e){} }
+    if(!ok && window.FX){ try{ FX.shake(head); }catch(e){} }
+    const af=$('#after');
+    af.innerHTML='<div class="verdict '+(ok?'ok':'no')+'">'+(ok?'⭕ 정답입니다!'+(S.combo>1?' 🔥 '+S.combo+'연속':''):'❌ 아쉬워요. 풀이를 보고 다시 확인해 보세요.')+'</div>'
+      +'<div class="explain"><b>풀이</b><ol>'+p.sol.map(function(s){ return '<li>'+s+'</li>'; }).join('')+'</ol>'
+      +'<div style="margin-top:8px;font-weight:800;color:var(--ok)">정답 &nbsp;'+ansText+'</div></div>'
+      +(p.solFig||'');
+    fixMinus(af);
+    const nb=el('<button class="btn btn-primary" style="margin-top:12px">'+(S.i+1===S.list.length?'결과 보기':'다음 문제 →')+'</button>');
+    nb.onclick=next; af.appendChild(nb);
+    nb.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function next(){
+    S.i++;
+    if(S.i>=S.list.length) finish(); else drawQ();
+  }
+}
+
+/* ───────── 결과 ───────── */
+function finish(){
+  const S=SESSION, box=$('#view'); box.innerHTML='';
+  const total=S.list.length, pct=Math.round(S.correct/total*100);
+  const sec=Math.round((Date.now()-S.t0)/1000);
+  const isEx=S.mode==='exam';
+
+  if(!isEx){
+    const key=S.part;
+    const tid=(TOPICS.filter(function(t){ return t.name===key; })[0]||{}).id;
+    if(tid){ ST.best[tid]=Math.max(ST.best[tid]||0,pct); }
+  }
+  S.wrong.forEach(function(w){ ST.wrong.push(w); });
+  if(ST.wrong.length>60) ST.wrong=ST.wrong.slice(-60);
+  save();
+
+  const msg = pct===100?'완벽합니다! 🎉' : pct>=80?'아주 좋아요 👍' : pct>=60?'거의 다 왔어요 💪' : '풀이를 다시 읽어 봅시다 📖';
+  box.appendChild(el('<div class="card" style="text-align:center">'
+    +'<div class="muted">'+(isEx?'🏁 종합시험':'✏️ 연습 · '+S.part)+'</div>'
+    +'<div class="score">'+pct+'점</div>'
+    +'<div>'+total+'문항 중 <b>'+S.correct+'</b>문항 정답 · '+sec+'초'
+    +(S.bestCombo>1?' · 최고 '+S.bestCombo+'연속':'')+'</div>'
+    +'<div style="margin-top:6px;font-weight:700">'+msg+'</div>'
+    +'<div id="rankBox" style="margin-top:10px"></div>'
+    +'<div id="rSubmitAnchor" style="margin-top:12px"></div>'
+    +'</div>'));
+
+  if(window.Rank){
+    try{
+      const res=Rank.award(pct,{mode:(isEx?'종합시험':S.part)});
+      if(res && Rank.resultBox) $('#rankBox').innerHTML=Rank.resultBox(res);
+      else if(Rank.card) $('#rankBox').innerHTML=Rank.card();
+    }catch(e){}
+  }
+  if(window.FX && pct>=80){ try{ FX.banner(pct===100?'만점!':'잘했어요!'); }catch(e){} }
+
+  if(S.wrong.length){
+    box.appendChild(el('<div class="card"><h3>📕 이번에 틀린 문제 '+S.wrong.length+'개</h3>'
+      +'<div class="muted">풀이를 꼭 한 번 읽고 넘어가세요.</div></div>'));
+    S.wrong.forEach(function(w){ box.appendChild(wrongCard(w)); });
+  } else {
+    box.appendChild(el('<div class="card" style="text-align:center">🎯 틀린 문제가 없습니다!</div>'));
+  }
+
+  const again=el('<div class="card row">'
+    +'<button class="btn btn-primary" id="agn">🔁 다시 풀기 (숫자가 바뀝니다)</button>'
+    +'<button class="btn" id="hom">← 처음으로</button></div>');
+  box.appendChild(again);
+  const part=S.part, mode=S.mode;
+  $('#agn').onclick=function(){
+    const tops = part==='전체 섞기'||part==='종합시험' ? TOPICS : TOPICS.filter(function(t){ return t.name===part; });
+    startSession({mode:mode,topics:tops,n:(mode==='exam'?CFG.examN:CFG.practiceN),part:part});
+  };
+  $('#hom').onclick=function(){ render(mode==='exam'?'exam':'practice'); };
+
+  /* 결과 제출 (규약 1) */
+  const lastResult={
+    score:pct, correct:S.correct, total:total, durationSec:sec,
+    wrong:S.wrong.map(function(w){ return w.no+'번 '+w.topicName+' — '+w.tag; }),
+    mode:'도형의 방정식 자습 — '+(isEx?'종합시험':'연습 · '+S.part)
+  };
+  const anchor=$('#rSubmitAnchor');
+  if(window.ResultCollector && ResultCollector.attach && anchor){
+    const btn=ResultCollector.attach(anchor, function(){ return lastResult; }, {
+      id:'rcBtn', className:'btn btn-primary', mode:lastResult.mode,
+      extra:['도형의 방정식 '+(isEx?'종합시험':S.part)+' '+pct+'점']
+    });
+    if(btn){ btn.style.width='100%'; btn.textContent='📤 ['+(isEx?'종합시험':S.part)+'] 결과 제출'; }
+  }
+  fixMinus(box);
+  window.scrollTo(0,0);
+}
+
+function wrongCard(w){
+  return el('<div class="card">'
+    +'<span class="pill">'+w.topicName+(w.tag===w.topicName?'':' · '+w.tag)+'</span>'
+    +'<div class="qtext">'+w.no+'. '+w.q+'</div>'
+    +(w.fig||'')
+    +'<div class="muted">내가 쓴 답 : '+w.my+'</div>'
+    +'<div style="color:var(--ok);font-weight:700">정답 : '+w.ans+'</div>'
+    +'<div class="explain"><b>풀이</b><ol>'+w.sol.map(function(s){ return '<li>'+s+'</li>'; }).join('')+'</ol></div>'
+    +(w.solFig||'')
+    +'</div>');
+}
+
+/* ───────── 📕 오답노트 ───────── */
+function renderWrong(box){
+  if(!ST.wrong.length){
+    box.appendChild(el('<div class="empty">🗒️ 아직 오답이 없어요!<br>연습이나 종합시험을 풀면 여기에 모입니다.</div>'));
+    return;
+  }
+  const head=el('<div class="card row" style="justify-content:space-between">'
+    +'<b>모아 둔 오답 '+ST.wrong.length+'문항</b>'
+    +'<button class="btn" id="clrWrong">비우기</button></div>');
+  box.appendChild(head);
+  $('#clrWrong').onclick=function(){ if(confirm('오답노트를 모두 지울까요?')){ ST.wrong=[]; save(); render('wrong'); } };
+  ST.wrong.slice().reverse().forEach(function(w){ box.appendChild(wrongCard(w)); });
+}
+
+$('#hdSub').textContent='주제 '+TOPICS.length+'개 · 문제는 풀 때마다 숫자가 바뀝니다';
+render('learn');
+</script>
+
+<!-- 공용 위젯 — 순서 그대로 두세요 (규약 1 · 3 · 3-1) -->
+<script src="https://hongyul67-cpu.github.io/links/collector.js" data-tool="도형의 방정식 자습"></script>
+<script src="https://hongyul67-cpu.github.io/links/fx.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/rank.js" data-tool="도형의 방정식 자습" data-pace="class"></script>
+<script src="https://hongyul67-cpu.github.io/links/reset.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/backbar.js"></script>
+</body>
+</html>
