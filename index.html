@@ -155,6 +155,15 @@ function sqh(x){ return '<span class="sq">√<span>'+x+'</span></span>'; }
 function N(v){ return String(v).replace(/^-/,'−'); }
 /* 좌표 HTML */
 function P(x,y){ return '('+N(x)+', '+N(y)+')'; }
+/* 더하는 식에 쓸 때 음수는 괄호로 : (−3) + 5 */
+function par(v){ return v<0 ? '('+N(v)+')' : String(v); }
+/* 숫자를 소리 내어 읽었을 때 받침이 있는가 (일·삼·육·칠·팔·십·영) */
+const BATCHIM={0:1,1:1,3:1,6:1,7:1,8:1,2:0,4:0,5:0,9:0};
+const RIEUL={1:1,7:1,8:1};
+function j_eul(v){ return BATCHIM[Math.abs(v)%10] ? '을' : '를'; }
+function j_gwa(v){ return BATCHIM[Math.abs(v)%10] ? '과' : '와'; }
+function j_i(v){   return BATCHIM[Math.abs(v)%10] ? '이' : '가'; }
+function j_ro(v){  const d=Math.abs(v)%10; return (!BATCHIM[d]||RIEUL[d]) ? '로' : '으로'; }
 const X = '<span class="mt">x</span>';
 const Y = '<span class="mt">y</span>';
 /* 부호 붙여 이어 쓰기 :  + 3 / − 3 */
@@ -289,15 +298,15 @@ function g_mid1(){
   return {
     _dbg:{A:[x1,y1],B:[x2,y2]},
     tag:'중점 구하기',
-    q:'두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 를 이은 선분 AB 의 <b>중점 M</b> 의 좌표를 구하시오.',
+    q:'두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' '+j_eul(y2)+' 이은 선분 AB 의 <b>중점 M</b> 의 좌표를 구하시오.',
     fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
           {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
     hint:'중점의 좌표 = 양 끝점 좌표의 <b>평균</b>',
     fields:[{label:'M 의 '+X+'좌표',ans:[String(mx)]},{label:'M 의 '+Y+'좌표',ans:[String(my)]}],
     sol:[
       '중점은 양 끝점 좌표의 <b>평균</b>입니다.',
-      X+'좌표 : ('+x1+sg(x2)+') ÷ 2 = '+(x1+x2)+' ÷ 2 = <b>'+mx+'</b>',
-      Y+'좌표 : ('+y1+sg(y2)+') ÷ 2 = '+(y1+y2)+' ÷ 2 = <b>'+my+'</b>',
+      X+'좌표 : ('+par(x1)+' + '+par(x2)+') ÷ 2 = '+N(x1+x2)+' ÷ 2 = <b>'+N(mx)+'</b>',
+      Y+'좌표 : ('+par(y1)+' + '+par(y2)+') ÷ 2 = '+N(y1+y2)+' ÷ 2 = <b>'+N(my)+'</b>',
       '따라서 M'+P(mx,my)+' 입니다.'
     ]
   };
@@ -316,8 +325,8 @@ function g_mid2(){
     fields:[{label:'B 의 '+X+'좌표',ans:[String(x2)]},{label:'B 의 '+Y+'좌표',ans:[String(y2)]}],
     sol:[
       'B의 좌표를 ('+X+', '+Y+') 라 놓습니다.',
-      X+'좌표 : ('+x1+' + '+X+') ÷ 2 = '+mx+' → '+x1+' + '+X+' = '+(2*mx)+' → '+X+' = <b>'+x2+'</b>',
-      Y+'좌표 : ('+y1+' + '+Y+') ÷ 2 = '+my+' → '+y1+' + '+Y+' = '+(2*my)+' → '+Y+' = <b>'+y2+'</b>',
+      X+'좌표 : ('+par(x1)+' + '+X+') ÷ 2 = '+N(mx)+' → '+par(x1)+' + '+X+' = '+N(2*mx)+' → '+X+' = <b>'+N(x2)+'</b>',
+      Y+'좌표 : ('+par(y1)+' + '+Y+') ÷ 2 = '+N(my)+' → '+par(y1)+' + '+Y+' = '+N(2*my)+' → '+Y+' = <b>'+N(y2)+'</b>',
       '따라서 B'+P(x2,y2)+' 입니다. (M 이 A 와 B 의 한가운데인지 그림으로 확인해 보세요.)'
     ]
   };
@@ -340,16 +349,16 @@ function g_cent1(){
     fields:[{label:'G 의 '+X+'좌표',ans:[String(gx)]},{label:'G 의 '+Y+'좌표',ans:[String(gy)]}],
     sol:[
       '무게중심은 세 꼭짓점 좌표의 <b>평균</b>입니다.',
-      X+'좌표 : ('+x1+sg(x2)+sg(x3)+') ÷ 3 = '+(x1+x2+x3)+' ÷ 3 = <b>'+gx+'</b>',
-      Y+'좌표 : ('+y1+sg(y2)+sg(y3)+') ÷ 3 = '+(y1+y2+y3)+' ÷ 3 = <b>'+gy+'</b>',
+      X+'좌표 : ('+par(x1)+' + '+par(x2)+' + '+par(x3)+') ÷ 3 = '+N(x1+x2+x3)+' ÷ 3 = <b>'+N(gx)+'</b>',
+      Y+'좌표 : ('+par(y1)+' + '+par(y2)+' + '+par(y3)+') ÷ 3 = '+N(y1+y2+y3)+' ÷ 3 = <b>'+N(gy)+'</b>',
       '따라서 G'+P(gx,gy)+' 입니다.'
     ]
   };
 }
 function g_cent2(){
   let a,x2,x3,y1,y2,y3;
-  do{ a=R(-7,7); x2=R(-7,7); x3=R(-7,7); }while((a+x2+x3)%3!==0);
-  do{ y1=R(-7,7); y2=R(-7,7); y3=R(-7,7); }while((y1+y2+y3)%3!==0);
+  do{ a=RZ(-7,7); x2=RZ(-7,7); x3=RZ(-7,7); }while((a+x2+x3)%3!==0);
+  do{ y1=RZ(-7,7); y2=RZ(-7,7); y3=RZ(-7,7); }while((y1+y2+y3)%3!==0);
   const gx=(a+x2+x3)/3, b=(y1+y2+y3)/3;
   return {
     _dbg:{B:[x2,y2],C:[x3,y3],G:[gx,b]},
@@ -360,7 +369,7 @@ function g_cent2(){
     sol:[
       X+'좌표로 식을 세우면 : (<i>a</i>'+sg(x2)+sg(x3)+') ÷ 3 = '+gx,
       '→ <i>a</i>'+sg(x2+x3)+' = '+(3*gx)+' → <i>a</i> = '+(3*gx)+' '+(x2+x3>=0?'−':'+')+' '+Math.abs(x2+x3)+' = <b>'+a+'</b>',
-      Y+'좌표로 식을 세우면 : <i>b</i> = ('+y1+sg(y2)+sg(y3)+') ÷ 3 = '+(y1+y2+y3)+' ÷ 3 = <b>'+b+'</b>',
+      Y+'좌표로 식을 세우면 : <i>b</i> = ('+par(y1)+' + '+par(y2)+' + '+par(y3)+') ÷ 3 = '+N(y1+y2+y3)+' ÷ 3 = <b>'+N(b)+'</b>',
       '따라서 <i>a</i> = '+a+', <i>b</i> = '+b+' 입니다.'
     ]
   };
@@ -377,7 +386,7 @@ function g_div1(){
   return {
     _dbg:{A:[x1,y1],B:[x2,y2],m:m,n:n},
     tag:m+':'+n+' 내분점',
-    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 에 대하여 선분 AB 를 <b>'+m+' : '+n+'</b> 으로 내분하는 점 P 의 좌표를 구하시오.',
+    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B'+P(x2,y2)+' 에 대하여 선분 AB 를 <b>'+m+' : '+n+'</b> '+j_ro(n)+' 내분하는 점 P 의 좌표를 구하시오.',
     fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
           {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
     hint:'A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>), B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>) 를 <i>m</i> : <i>n</i> 으로 내분하는 점은 '
@@ -386,10 +395,10 @@ function g_div1(){
         +'<b>뒷점 좌표에 앞의 수 m 을 곱한다</b>는 것만 기억하면 됩니다.',
     fields:[{label:'P 의 '+X+'좌표',ans:[String(px)]},{label:'P 의 '+Y+'좌표',ans:[String(py)]}],
     sol:[
-      '공식에 <i>m</i> = '+m+', <i>n</i> = '+n+' 을 넣습니다. 분모는 <i>m</i> + <i>n</i> = '+s+' 입니다.',
-      X+'좌표 : ('+m+'×'+x2+' + '+n+'×'+x1+') ÷ '+s+' = ('+(m*x2)+sg(n*x1)+') ÷ '+s+' = '+(m*x2+n*x1)+' ÷ '+s+' = <b>'+px+'</b>',
-      Y+'좌표 : ('+m+'×'+y2+' + '+n+'×'+y1+') ÷ '+s+' = ('+(m*y2)+sg(n*y1)+') ÷ '+s+' = '+(m*y2+n*y1)+' ÷ '+s+' = <b>'+py+'</b>',
-      '따라서 P'+P(px,py)+' 입니다. 그림에서 P 는 A 쪽에서 '+m+'칸, B 쪽에서 '+n+'칸 되는 자리입니다.'
+      '공식에 <i>m</i> = '+m+', <i>n</i> = '+n+' '+j_eul(n)+' 넣습니다. 분모는 <i>m</i> + <i>n</i> = '+s+' 입니다.',
+      X+'좌표 : ('+m+'×'+par(x2)+' + '+n+'×'+par(x1)+') ÷ '+s+' = ('+par(m*x2)+' + '+par(n*x1)+') ÷ '+s+' = '+N(m*x2+n*x1)+' ÷ '+s+' = <b>'+N(px)+'</b>',
+      Y+'좌표 : ('+m+'×'+par(y2)+' + '+n+'×'+par(y1)+') ÷ '+s+' = ('+par(m*y2)+' + '+par(n*y1)+') ÷ '+s+' = '+N(m*y2+n*y1)+' ÷ '+s+' = <b>'+N(py)+'</b>',
+      '따라서 P'+P(px,py)+' 입니다. 그림에서 AP : PB = '+m+' : '+n+' '+j_i(n)+' 되는 자리인지 확인해 보세요.'
     ]
   };
 }
@@ -405,14 +414,14 @@ function g_div2(){
   return {
     _dbg:{A:[x1,y1],By:y2,m:m,n:n},
     tag:'내분점이 축 위에 있을 조건',
-    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B(<i>a</i>, '+y2+') 를 이은 선분 AB 를 <b>'+m+' : '+n+'</b> 으로 내분하는 점 P 가 '+Y+'축 위에 있다. 상수 <i>a</i> 의 값과 점 P 의 좌표를 구하시오.',
+    q:'좌표평면 위의 두 점 A'+P(x1,y1)+', B(<i>a</i>, '+N(y2)+') '+j_eul(y2)+' 이은 선분 AB 를 <b>'+m+' : '+n+'</b> '+j_ro(n)+' 내분하는 점 P 가 '+Y+'축 위에 있다. 상수 <i>a</i> 의 값과 점 P 의 좌표를 구하시오.',
     hint:''+Y+'축 위의 점은 '+X+'좌표가 0 입니다. 내분점 공식으로 P 의 '+X+'좌표를 <i>a</i> 로 나타낸 뒤 0 으로 놓습니다.',
     fields:[{label:'a 의 값',ans:[String(a)]},{label:'P 의 '+X+'좌표',ans:['0']},{label:'P 의 '+Y+'좌표',ans:[String(py)]}],
     sol:[
-      'P 의 '+X+'좌표 = ('+m+'×<i>a</i> + '+n+'×'+x1+') ÷ '+s+' = ('+m+'<i>a</i>'+sg(n*x1)+') ÷ '+s,
-      'P 가 '+Y+'축 위의 점이므로 '+X+'좌표가 0 입니다. → '+m+'<i>a</i>'+sg(n*x1)+' = 0 → <i>a</i> = <b>'+a+'</b>',
-      'P 의 '+Y+'좌표 = ('+m+'×'+y2+' + '+n+'×'+y1+') ÷ '+s+' = '+(m*y2+n*y1)+' ÷ '+s+' = <b>'+py+'</b>',
-      '따라서 <i>a</i> = '+a+' 이고 P(0, '+py+') 입니다.'
+      'P 의 '+X+'좌표 = ('+m+'×<i>a</i> + '+n+'×'+par(x1)+') ÷ '+s+' = ('+term(m,'<i>a</i>')+sg(n*x1)+') ÷ '+s,
+      'P 가 '+Y+'축 위의 점이므로 '+X+'좌표가 0 입니다. → '+term(m,'<i>a</i>')+sg(n*x1)+' = 0 → <i>a</i> = <b>'+N(a)+'</b>',
+      'P 의 '+Y+'좌표 = ('+m+'×'+par(y2)+' + '+n+'×'+par(y1)+') ÷ '+s+' = '+N(m*y2+n*y1)+' ÷ '+s+' = <b>'+N(py)+'</b>',
+      '따라서 <i>a</i> = '+N(a)+' 이고 P(0, '+N(py)+') 입니다.'
     ]
   };
 }
@@ -461,8 +470,8 @@ function g_dist2(){
     fields:[{label:'P 의 '+X+'좌표',ans:[String(a)]},{label:'P 의 '+Y+'좌표',ans:['0']}],
     sol:[
       'P 가 '+X+'축 위의 점이므로 '+Y+'좌표는 0 입니다. P(<i>a</i>, 0) 이라 놓습니다.',
-      'PA² = (<i>a</i> − ('+x1+'))² + (0 − ('+y1+'))² = '+(x1===0?'<i>a</i>²':'(<i>a</i>'+sg(-x1)+')²')+' + '+(y1*y1),
-      'PB² = (<i>a</i> − ('+x2+'))² + (0 − ('+y2+'))² = '+(x2===0?'<i>a</i>²':'(<i>a</i>'+sg(-x2)+')²')+' + '+(y2*y2),
+      'PA² = (<i>a</i> − '+par(x1)+')² + (0 − '+par(y1)+')² = '+(x1===0?'<i>a</i>²':'(<i>a</i>'+sg(-x1)+')²')+' + '+(y1*y1),
+      'PB² = (<i>a</i> − '+par(x2)+')² + (0 − '+par(y2)+')² = '+(x2===0?'<i>a</i>²':'(<i>a</i>'+sg(-x2)+')²')+' + '+(y2*y2),
       'PA = PB 이므로 PA² = PB². 전개하여 <i>a</i>² 를 지우면 '+(2*(x2-x1))+'<i>a</i> = '+((x2*x2+y2*y2)-(x1*x1+y1*y1))+' → <i>a</i> = <b>'+a+'</b>',
       '따라서 P'+P(a,0)+' 입니다.'
     ]
@@ -476,15 +485,17 @@ function g_line1(){
   return {
     _dbg:{m:m,pt:[x1,y1]},
     tag:'기울기와 한 점으로 직선 구하기',
-    q:'기울기가 <b>'+m+'</b> 이고 점 '+P(x1,y1)+' 을 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
+    q:'기울기가 <b>'+N(m)+'</b> 이고 점 '+P(x1,y1)+' '+j_eul(y1)+' 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
     hint:'기울기가 <i>m</i> 이고 점 (<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>) 을 지나는 직선 : '+Y+' − <i>y</i><sub>1</sub> = <i>m</i>('+X+' − <i>x</i><sub>1</sub>)',
     fields:[{label:'기울기 m',ans:[String(m)]},{label:''+Y+'절편 n',ans:[String(n)]}],
     solFig: planeOf([[x1,y1],[0,n]],[{t:'line',a:m,b:-1,c:n},{t:'pt',x:x1,y:y1,label:'주어진 점'},{t:'pt',x:0,y:n,label:'n',color:'#e5484d'}]),
     sol:[
-      '기울기는 문제에 주어진 그대로 <i>m</i> = <b>'+m+'</b> 입니다.',
-      ''+Y+' − ('+y1+') = '+m+'('+X+' − ('+x1+')) 에 넣고 정리합니다.',
-      ''+Y+' = '+term(m,X)+' '+(m*x1<0?'+ ':'− ')+Math.abs(m*x1)+' '+(y1<0?'− ':'+ ')+Math.abs(y1)+' → <b>'+lineMN(m,n)+'</b>',
-      '다른 방법 : '+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입하면 '+y1+' = '+(m*x1)+' + <i>n</i> → <i>n</i> = <b>'+n+'</b>'
+      '기울기는 문제에 주어진 그대로 <i>m</i> = <b>'+N(m)+'</b> 입니다.',
+      ''+Y+' − '+par(y1)+' = '+term(m,'('+X+' − '+par(x1)+')')+' 에 넣고 정리합니다.',
+      ''+Y+' = '+term(m,X)+(m*x1===0?'':(m*x1<0?' + ':' − ')+Math.abs(m*x1))+(y1<0?' − ':' + ')+Math.abs(y1)
+        +(m*x1===0?'':' → <b>'+lineMN(m,n)+'</b>'),
+      '다른 방법 : '+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' '+j_eul(y1)+' 대입하면 '
+        +N(y1)+' = '+N(m)+'×'+par(x1)+' + <i>n</i> = '+N(m*x1)+' + <i>n</i> → <i>n</i> = <b>'+N(n)+'</b>'
     ]
   };
 }
@@ -496,14 +507,14 @@ function g_line2(){
   return {
     _dbg:{A:[x1,y1],B:[x2,y2]},
     tag:'두 점을 지나는 직선',
-    q:'두 점 '+P(x1,y1)+' 와 '+P(x2,y2)+' 를 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
+    q:'두 점 '+P(x1,y1)+' '+j_gwa(y1)+' '+P(x2,y2)+' '+j_eul(y2)+' 지나는 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오.',
     fig: planeOf([[x1,y1],[x2,y2]],[{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
     hint:'기울기 = <span class="fr"><span class="nu">Δ'+Y+'</span><span>Δ'+X+'</span></span> = <span class="fr"><span class="nu">'+Y+'좌표의 차</span><span>'+X+'좌표의 차</span></span> — 빼는 순서를 위아래가 같게 맞춰야 합니다.',
     fields:[{label:'기울기 m',ans:[String(m)]},{label:''+Y+'절편 n',ans:[String(n)]}],
     solFig: planeOf([[x1,y1],[x2,y2],[0,n]],[{t:'line',a:m,b:-1,c:n},{t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}]),
     sol:[
       '기울기 = ('+y2+' − ('+y1+')) ÷ ('+x2+' − ('+x1+')) = '+(y2-y1)+' ÷ '+dx+' = <b>'+m+'</b>',
-      ''+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입합니다.',
+      ''+Y+' = '+term(m,X)+' + <i>n</i> 에 점 '+P(x1,y1)+' '+j_eul(y1)+' 대입합니다.',
       ''+y1+' = '+m+' × ('+x1+') + <i>n</i> = '+(m*x1)+' + <i>n</i> → <i>n</i> = <b>'+n+'</b>',
       '따라서 직선의 방정식은 <b>'+lineMN(m,n)+'</b> 입니다.'
     ]
@@ -540,7 +551,7 @@ function g_perp2(){
   return {
     _dbg:{kind:kind,m:m,pt:[x1,y1]},
     tag:kind+'인 직선의 방정식',
-    q:'점 '+P(x1,y1)+' 을 지나고 직선 <b>'+lineMN(m,n)+'</b> 에 <b>'+kind+'</b>인 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오. (분수는 3/2 처럼 적습니다.)',
+    q:'점 '+P(x1,y1)+' '+j_eul(y1)+' 지나고 직선 <b>'+lineMN(m,n)+'</b> 에 <b>'+kind+'</b>인 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 나타낼 때, <i>m</i> 과 <i>n</i> 의 값을 구하시오. (분수는 3/2 처럼 적습니다.)',
     hint:'먼저 기울기를 정합니다 — 평행이면 <b>같은 기울기</b>, 수직이면 <b>곱해서 −1</b> 이 되는 기울기. 그다음 지나는 점을 대입해 '+Y+'절편을 구합니다.',
     fields:[{label:'기울기 m',ans:[frs(m2n,m2d)]},{label:''+Y+'절편 n',ans:[String(nn)]}],
     solFig: planeOf([[x1,y1],[0,nn],[0,n]],[{t:'line',a:m,b:-1,c:n,color:'#9aa4b2',dash:true},
@@ -549,9 +560,9 @@ function g_perp2(){
       '주어진 직선의 기울기는 '+m+' 입니다.',
       (kind==='평행'
         ? '평행이므로 구하는 직선의 기울기도 <b>'+m+'</b> 입니다.'
-        : '수직이므로 기울기는 '+m+' 과 곱해서 −1 이 되는 수, 즉 <b>'+frs(-1,m)+'</b> 입니다.'),
-      ''+Y+' = '+(m2d===1?term(m2n,X):frh(m2n,m2d)+X)+' + <i>n</i> 에 점 '+P(x1,y1)+' 을 대입하면 '
-        +y1+' = '+(m2n*x1/m2d)+' + <i>n</i> → <i>n</i> = <b>'+nn+'</b>',
+        : '수직이므로 기울기는 '+N(m)+' '+j_gwa(m)+' 곱해서 −1 이 되는 수, 즉 <b>'+frh(-1,m)+'</b> 입니다.'),
+      ''+Y+' = '+(m2d===1?term(m2n,X):frh(m2n,m2d)+X)+' + <i>n</i> 에 점 '+P(x1,y1)+' '+j_eul(y1)+' 대입하면 '
+        +N(y1)+' = '+N(m2n*x1/m2d)+' + <i>n</i> → <i>n</i> = <b>'+N(nn)+'</b>',
       '따라서 <b>'+lineMN(m2d===1?m2n:[m2n,m2d],nn)+'</b> 입니다.'
     ]
   };
@@ -567,12 +578,12 @@ function g_pd1(){
   return {
     _dbg:{pt:[p,q],L:[a,b,c]},
     tag:'점과 직선 사이의 거리',
-    q:'점 '+P(p,q)+' 와 직선 <b>'+lineGen(a,b,c)+'</b> 사이의 거리를 구하시오.',
+    q:'점 '+P(p,q)+' '+j_gwa(q)+' 직선 <b>'+lineGen(a,b,c)+'</b> 사이의 거리를 구하시오.',
     fig: planeOf([[p,q]],[{t:'line',a:a,b:b,c:c,color:'#9aa4b2'},{t:'pt',x:p,y:q,label:'P'}],2),
     hint:'<i>d</i> = <span class="fr"><span class="nu">| 직선의 식에 '+X+', '+Y+' 좌표를 대입한 값 |</span><span>'+sqh('계수의 제곱의 합')+'</span></span> — 분모는 <i>a</i>²+<i>b</i>² 의 제곱근입니다.',
     fields:[{label:'거리 d',ans:[String(k)]}],
     sol:[
-      '분자 : | '+a+'×('+p+')'+(b<0?' − ':' + ')+Math.abs(b)+'×('+q+')'+sg(c)+' | = | '+(a*p)+sg(b*q)+sg(c)+' | = '+Math.abs(a*p+b*q+c),
+      '분자 : | '+N(a)+'×'+par(p)+(b<0?' − ':' + ')+Math.abs(b)+'×'+par(q)+sg(c)+' | = | '+N(a*p)+sg(b*q)+sg(c)+' | = '+Math.abs(a*p+b*q+c),
       '분모 : '+sqh('('+a+')² + ('+b+')²')+' = '+sqh(a*a+b*b)+' = '+hyp,
       '<i>d</i> = '+Math.abs(a*p+b*q+c)+' ÷ '+hyp+' = <b>'+k+'</b>',
       '절댓값을 씌우므로 거리는 항상 0 이상입니다.'
@@ -582,27 +593,29 @@ function g_pd1(){
 function g_pd2(){
   const mm=pick([[3,4],[-3,4],[4,3],[-4,3]]);
   const mn=mm[0], md=mm[1];
-  let A=mn, B=-md;
+  let A=mn, B=-md, flip=false;
+  if(A<0){ A=-A; B=-B; flip=true; }          /* x 의 계수는 양수로 맞추는 것이 보통 */
   const p=R(-3,3), q=R(-3,3);
   const cand=[];
   for(let t=-9;t<=9;t++){
-    const num=A*p+B*q+md*t;
+    const num=A*p+B*q+(flip? -md*t : md*t);
     if(num!==0 && num%5===0) cand.push(t);
   }
   const t=pick(cand);
-  const C=md*t;
+  const C=flip? -md*t : md*t;
   const num=Math.abs(A*p+B*q+C), d=num/5;
   return {
     _dbg:{pt:[p,q],L:[A,B,C]},
     tag:'기울기 꼴 직선과의 거리',
-    q:'점 '+P(p,q)+' 와 직선 <b>'+lineMN([mn,md],t)+'</b> 사이의 거리를 구하시오.',
+    q:'점 '+P(p,q)+' '+j_gwa(q)+' 직선 <b>'+lineMN([mn,md],t)+'</b> 사이의 거리를 구하시오.',
     fig: planeOf([[p,q]],[{t:'line',a:A,b:B,c:C,color:'#9aa4b2'},{t:'pt',x:p,y:q,label:'P'}],2),
     hint:'거리 공식은 <b><i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴</b>에서만 쓸 수 있습니다. 먼저 이항하고 분모를 없애 정수 계수로 고치세요.',
     fields:[{label:'거리 d',ans:[frs(num,5)]}],
     sol:[
-      '먼저 <i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴로 고칩니다. 양변에 '+md+' 를 곱하면 '+md+Y+' = '+mn+X+sg(md*t),
-      '이항하여 <b>'+lineGen(A,B,C)+'</b>',
-      '분자 : | '+A+'×('+p+')'+(B<0?' − ':' + ')+Math.abs(B)+'×('+q+')'+sg(C)+' | = '+num,
+      '먼저 <i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴로 고칩니다. 양변에 '+md+' '+j_eul(md)+' 곱하면 '+md+Y+' = '+term(mn,X)+sg(md*t),
+      (flip? '모두 좌변으로 이항하면 '+lineGen(mn,-md,md*t)+' — '+X+' 의 계수를 양수로 만들려고 양변에 −1 을 곱하면 <b>'+lineGen(A,B,C)+'</b>'
+           : '모두 좌변으로 이항하면 <b>'+lineGen(A,B,C)+'</b>'),
+      '분자 : | '+N(A)+'×'+par(p)+(B<0?' − ':' + ')+Math.abs(B)+'×'+par(q)+sg(C)+' | = | '+N(A*p)+sg(B*q)+sg(C)+' | = '+num,
       '분모 : '+sqh('('+A+')² + ('+B+')²')+' = '+sqh(A*A+B*B)+' = 5',
       '<i>d</i> = '+num+' ÷ 5 = <b>'+frs(num,5)+'</b>'
     ]
@@ -627,8 +640,8 @@ function g_cir1(){
     fields:[{label:'중심의 '+X+'좌표',ans:[String(a)]},{label:'중심의 '+Y+'좌표',ans:[String(b)]},{label:'반지름 r',ans:[String(r)]}],
     solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
     sol:[
-      sqx(X,a)+' 이므로 중심의 '+X+'좌표는 <b>'+a+'</b> 입니다. (괄호 안이 '+(a>=0?'− '+a:'+ '+Math.abs(a))+' 이면 '+a+')',
-      sqx(Y,b)+' 이므로 중심의 '+Y+'좌표는 <b>'+b+'</b> 입니다.',
+      sqx(X,a)+(a<0? ' 는 ('+X+' − ('+N(a)+'))² 와 같으므로' : ' 이므로')+' 중심의 '+X+'좌표는 <b>'+N(a)+'</b> 입니다.',
+      sqx(Y,b)+(b<0? ' 는 ('+Y+' − ('+N(b)+'))² 와 같으므로' : ' 이므로')+' 중심의 '+Y+'좌표는 <b>'+N(b)+'</b> 입니다.',
       '우변이 '+(r*r)+' = <i>r</i>² 이므로 반지름 <i>r</i> = '+sqh(r*r)+' = <b>'+r+'</b> 입니다.',
       '우변은 반지름이 아니라 <b>반지름의 제곱</b>이라는 점을 꼭 기억하세요.'
     ]
@@ -648,14 +661,14 @@ function g_cir2(){
   return {
     _dbg:{kind:kind,ctr:[a,b]},
     tag:cond,
-    q:'중심이 '+P(a,b)+' 이고 <b>'+cond+'</b> 의 방정식을 ('+X+' − <i>a</i>)² + ('+Y+' − <i>b</i>)² = <i>r</i>² 꼴로 나타낼 때, 우변의 값'+(Number.isInteger(r)?'과 반지름의 길이':'')+'을 구하시오.',
+    q:'중심이 '+P(a,b)+' 이고 <b>'+cond+'</b>의 방정식을 ('+X+' − <i>a</i>)² + ('+Y+' − <i>b</i>)² = <i>r</i>² 꼴로 나타낼 때, '+(Number.isInteger(r)?'우변의 값과 반지름의 길이를':'우변의 값을')+' 구하시오.',
     hint:'중심의 자리는 문제에 그대로 있습니다. 어려운 것은 <b>반지름</b> — '+(kind==='원점'?'중심에서 원점까지의 거리':'중심에서 그 축까지의 거리')+'를 재면 됩니다.',
     fields:f,
     solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
     sol:[
       why,
       (kind==='원점'
-        ? '<i>r</i>² = ('+a+' − 0)² + ('+b+' − 0)² = '+(a*a)+' + '+(b*b)+' = <b>'+r2+'</b>'
+        ? '<i>r</i>² = ('+N(a)+' − 0)² + ('+N(b)+' − 0)² = '+(a*a)+' + '+(b*b)+' = <b>'+r2+'</b>'
         : (kind==='x축'
             ? '<i>r</i> = |'+b+'| = '+Math.abs(b)+' → <i>r</i>² = <b>'+r2+'</b>'
             : '<i>r</i> = |'+a+'| = '+Math.abs(a)+' → <i>r</i>² = <b>'+r2+'</b>')),
@@ -672,7 +685,7 @@ function g_cir3(){
   return {
     _dbg:{A:[x1,y1],B:[x2,y2]},
     tag:'지름의 양 끝점으로 원 구하기',
-    q:'두 점 A'+P(x1,y1)+' 와 B'+P(x2,y2)+' 가 <b>지름의 양 끝점</b>인 원의 중심의 좌표와 반지름을 구하시오.',
+    q:'두 점 A'+P(x1,y1)+' '+j_gwa(y1)+' B'+P(x2,y2)+' '+j_i(y2)+' <b>지름의 양 끝점</b>인 원의 중심의 좌표와 반지름을 구하시오.',
     fig: planeOf([[x1,y1],[x2,y2]],[{t:'seg',x1:x1,y1:y1,x2:x2,y2:y2},
           {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'}],1),
     hint:'지름의 <b>한가운데</b>가 중심이고, 반지름은 지름의 <b>절반</b>입니다. 중점 공식과 두 점 사이의 거리 공식을 차례로 씁니다.',
@@ -680,7 +693,7 @@ function g_cir3(){
     solFig: planeOf([[cx-r,cy-r],[cx+r,cy+r]],[{t:'circle',cx:cx,cy:cy,r:r},
           {t:'pt',x:x1,y:y1,label:'A'},{t:'pt',x:x2,y:y2,label:'B'},{t:'pt',x:cx,y:cy,label:'중심',color:'#e5484d'}],1),
     sol:[
-      '중심 = 지름 AB 의 중점 : ( ('+x1+sg(x2)+') ÷ 2, ('+y1+sg(y2)+') ÷ 2 ) = <b>'+P(cx,cy)+'</b>',
+      '중심 = 지름 AB 의 중점 : ( ('+par(x1)+' + '+par(x2)+') ÷ 2, ('+par(y1)+' + '+par(y2)+') ÷ 2 ) = <b>'+P(cx,cy)+'</b>',
       '지름 AB = '+sqh('('+dx+')² + ('+dy+')²')+' = '+sqh(dx*dx+dy*dy)+' = '+(2*r),
       '반지름 = 지름 ÷ 2 = '+(2*r)+' ÷ 2 = <b>'+r+'</b>',
       '원의 방정식으로 쓰면 '+stdEq(cx,cy,r*r)+' 입니다.'
@@ -701,7 +714,7 @@ function g_gen1(){
             {label:'반지름 r',ans:[String(r)]},{label:'넓이 (π의 계수)',ans:[String(r*r)]}],
     solFig: planeOf([[a-r,b-r],[a+r,b+r]],[{t:'circle',cx:a,cy:b,r:r},{t:'pt',x:a,y:b,label:'중심'}],1),
     sol:[
-      X+', '+Y+' 끼리 모읍니다 : ('+X+'²'+sterm(D,X)+') + ('+Y+'²'+sterm(E,Y)+') = '+(-F),
+      X+', '+Y+' 끼리 모읍니다 : 상수항 '+N(F)+' 를 우변으로 넘기면 ('+X+'²'+sterm(D,X)+') + ('+Y+'²'+sterm(E,Y)+') = '+N(-F),
       X+' 의 계수 '+D+' 의 절반은 '+(D/2)+', 제곱하면 '+(a*a)+' — 양변에 더합니다. '
         +Y+' 의 계수 '+E+' 의 절반은 '+(E/2)+', 제곱하면 '+(b*b)+' — 이것도 양변에 더합니다.',
       '('+X+'²'+sterm(D,X)+' + '+(a*a)+') + ('+Y+'²'+sterm(E,Y)+' + '+(b*b)+') = '+(-F)+' + '+(a*a)+' + '+(b*b)+' = '+(r*r),
@@ -721,7 +734,7 @@ function g_k1(){
   return {
     _dbg:{al:al,be:be},
     tag:'원이 되기 위한 조건',
-    q:'방정식 <b>'+sqx(X,p)+' + '+sqx(Y,q)+' = '+right+'</b> 가 <b>원</b>을 나타내도록 하는 상수 <i>k</i> 의 값의 범위를 구하시오.',
+    q:'방정식 <b>'+sqx(X,p)+' + '+sqx(Y,q)+' = '+right+'</b> '+j_i(be)+' <b>원</b>을 나타내도록 하는 상수 <i>k</i> 의 값의 범위를 구하시오.',
     hint:'우변은 <b>반지름의 제곱</b>입니다. 반지름은 길이이므로 제곱은 항상 <b>0보다 커야</b> 합니다. (0 이면 점 하나, 음수이면 그런 도형은 없습니다.)',
     fields:[
       {label:'부등호',type:'select',opts:['>','<'],ans:[al>0?'>':'<']},
