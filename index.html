@@ -1084,8 +1084,9 @@ function fixMinus(root){
   if(!root) return;
   const w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
   const hit=[];
-  while(w.nextNode()){ if(/-\d/.test(w.currentNode.nodeValue)) hit.push(w.currentNode); }
-  hit.forEach(function(n){ n.nodeValue = n.nodeValue.replace(/-(?=\d)/g,'−'); });
+  const re=/(^|[\s(=,><\[])-(?=\d)/g;                 /* 「Ⅰ-1」 같은 이름표는 건드리지 않는다 */
+  while(w.nextNode()){ if(re.test(w.currentNode.nodeValue)){ re.lastIndex=0; hit.push(w.currentNode); } re.lastIndex=0; }
+  hit.forEach(function(n){ n.nodeValue = n.nodeValue.replace(re,'$1−'); });
 }
 
 function drawQ(){
