@@ -56,6 +56,7 @@
   .pill.u2{background:#e8f7ee;color:#0f7a3d}
   .pill.u3{background:#fdf0e2;color:#a85b04}
   .pill.u4{background:#f1e9fc;color:#6d28d9}
+  .pill.u5{background:#fde8ef;color:#be185d}
 
   /* 수식 */
   .mt{font-family:"Cambria Math","Times New Roman",serif;font-style:italic}
@@ -1101,6 +1102,251 @@ function g_cl5(){
   };
 }
 
+/* ───── 14. 평행이동 (자습 11차시) ───── */
+/* 도형의 방정식이 몇 차인지 보고 어떤 도형인지 가려내기 */
+function g_deg1(){
+  const kind = pick(['circle','line','para']);
+  const c = R(1,6)*R(1,6);
+  const eq = kind==='circle' ? X+'² + '+Y+'² = '+c
+           : kind==='line'   ? X+' + '+Y+' = '+c
+           :                   X+'² + '+Y+' = '+c;
+  const deg = kind==='circle' ? ['2','2'] : kind==='line' ? ['1','1'] : ['2','1'];
+  const shape = kind==='circle' ? '원' : kind==='line' ? '직선' : '포물선';
+  return {
+    _dbg:{kind:kind, c:c},
+    tag:'차수로 도형 알아보기',
+    q:'다음 방정식이 나타내는 도형은 무엇인가?<br><b>'+eq+'</b>',
+    hint:''+X+' 에 대한 차수와 '+Y+' 에 대한 차수를 각각 세어 봅니다. '
+       +'두 문자가 모두 2차인지, 모두 1차인지, 한쪽만 2차인지에 따라 도형이 달라집니다.',
+    fields:[{label:'x 에 대한 차수',ans:[deg[0]]},
+            {label:'y 에 대한 차수',ans:[deg[1]]},
+            {label:'나타내는 도형',type:'select',opts:['원','직선','포물선'],ans:[shape]}],
+    sol:[
+      ''+X+' 의 차수는 '+deg[0]+', '+Y+' 의 차수는 '+deg[1]+' 입니다.',
+      (kind==='circle' ? '두 문자가 <b>모두 2차</b>이고 계수가 같으므로 <b>원</b>입니다.'
+       : kind==='line' ? '두 문자가 <b>모두 1차</b>이므로 <b>직선</b>입니다.'
+       : '한 문자만 2차이고 다른 문자는 1차이므로 <b>포물선</b>입니다.'),
+      '<b>정리</b> — 모두 2차면 원, 모두 1차면 직선, 한쪽만 2차면 포물선입니다.'
+    ]
+  };
+}
+/* 점의 평행이동 */
+function g_tr1(){
+  const x=RZ(-6,6), y=RZ(-6,6), a=RZ(-5,5), b=RZ(-5,5);
+  const nx=x+a, ny=y+b;
+  return {
+    _dbg:{x:x, y:y, a:a, b:b},
+    tag:'점의 평행이동',
+    q:'점 '+P(x,y)+j_eul(y)+' '+X+'축의 방향으로 '+N(a)+'만큼, '
+      +Y+'축의 방향으로 '+N(b)+'만큼 평행이동한 점의 좌표를 구하시오.',
+    fig: planeOf([[x,y],[nx,ny]],[{t:'pt',x:x,y:y,label:'A'}]),
+    solFig: planeOf([[x,y],[nx,ny]],[{t:'pt',x:x,y:y,label:'A'},
+            {t:'seg',x1:x,y1:y,x2:nx,y2:ny},{t:'pt',x:nx,y:ny,label:'P'}]),
+    hint:'평행이동은 <b>더하기</b>입니다. '+X+'축 방향 이동량은 '+X+'좌표에, '
+       +Y+'축 방향 이동량은 '+Y+'좌표에 그대로 더합니다.',
+    fields:[{label:'옮겨진 점의 x좌표',ans:[String(nx)]},
+            {label:'옮겨진 점의 y좌표',ans:[String(ny)]}],
+    sol:[
+      ''+X+'좌표 : '+par(x)+' + '+par(a)+' = <b>'+N(nx)+'</b>',
+      ''+Y+'좌표 : '+par(y)+' + '+par(b)+' = <b>'+N(ny)+'</b>',
+      '따라서 옮겨진 점은 <b>'+P(nx,ny)+'</b> 입니다.'
+    ]
+  };
+}
+/* 평행이동량 거꾸로 구하기 */
+function g_tr2(){
+  const x=RZ(-6,6), y=RZ(-6,6), a=RZ(-5,5), b=RZ(-5,5);
+  const nx=x+a, ny=y+b;
+  return {
+    _dbg:{x:x, y:y, a:a, b:b},
+    tag:'평행이동량 a, b 구하기',
+    q:'점 '+P(x,y)+j_eul(y)+' '+X+'축의 방향으로 <i>a</i>만큼, '+Y+'축의 방향으로 <i>b</i>만큼 '
+      +'평행이동하였더니 점 '+P(nx,ny)+j_i(ny)+' 되었다. <i>a</i>, <i>b</i> 의 값을 구하시오.',
+    hint:'옮긴 뒤의 좌표 = 원래 좌표 + 이동량 입니다. 이동량만 남기려면 <b>빼면</b> 됩니다.',
+    fields:[{label:'a 의 값',ans:[String(a)]},
+            {label:'b 의 값',ans:[String(b)]}],
+    sol:[
+      ''+X+'좌표에서 '+par(x)+' + <i>a</i> = '+N(nx)+' 이므로 <i>a</i> = '+N(nx)+' − '+par(x)+' = <b>'+N(a)+'</b>',
+      ''+Y+'좌표에서 '+par(y)+' + <i>b</i> = '+N(ny)+' 이므로 <i>b</i> = '+N(ny)+' − '+par(y)+' = <b>'+N(b)+'</b>'
+    ]
+  };
+}
+/* 원의 평행이동 */
+function g_tr3(){
+  const cx=RZ(-5,5), cy=RZ(-5,5), r=R(1,4), a=RZ(-4,4), b=RZ(-4,4);
+  const nx=cx+a, ny=cy+b;
+  return {
+    _dbg:{cx:cx, cy:cy, r:r, a:a, b:b},
+    tag:'원의 평행이동',
+    q:'원 <b>'+stdEq(cx,cy,r*r)+'</b> '+j_eul(r*r)+' '+X+'축의 방향으로 '+N(a)+'만큼, '
+      +Y+'축의 방향으로 '+N(b)+'만큼 평행이동한 원의 <b>중심과 반지름</b>을 구하시오.',
+    fig: planeOf([[cx-r,cy-r],[cx+r,cy+r],[nx-r,ny-r],[nx+r,ny+r]],
+          [{t:'circle',cx:cx,cy:cy,r:r},{t:'pt',x:cx,y:cy,label:'C'}]),
+    solFig: planeOf([[cx-r,cy-r],[cx+r,cy+r],[nx-r,ny-r],[nx+r,ny+r]],
+          [{t:'circle',cx:cx,cy:cy,r:r},{t:'pt',x:cx,y:cy,label:'C'},
+           {t:'circle',cx:nx,cy:ny,r:r,color:'#e5484d'},{t:'pt',x:nx,y:ny,label:'C′'}]),
+    hint:'원을 옮겨도 <b>크기는 변하지 않습니다.</b> 중심만 점의 평행이동과 똑같이 옮기면 됩니다.',
+    fields:[{label:'옮겨진 원의 중심 x좌표',ans:[String(nx)]},
+            {label:'옮겨진 원의 중심 y좌표',ans:[String(ny)]},
+            {label:'반지름',ans:[String(r)]}],
+    sol:[
+      '원 '+stdEq(cx,cy,r*r)+' 의 중심은 '+P(cx,cy)+', 반지름은 '+r+' 입니다.',
+      '중심을 평행이동 : '+X+'좌표 '+par(cx)+' + '+par(a)+' = '+N(nx)+', '
+        +Y+'좌표 '+par(cy)+' + '+par(b)+' = '+N(ny),
+      '반지름은 그대로 '+r+' 이므로 옮겨진 원은 <b>'+stdEq(nx,ny,r*r)+'</b> 입니다.',
+      '<b>식으로 확인</b> — '+X+' 자리에 '+X+' − '+par(a)+' '+j_eul(a)+', '+Y+' 자리에 '+Y+' − '+par(b)+' '+j_eul(b)+' '
+        +'넣어도 같은 식이 나옵니다.'
+    ]
+  };
+}
+/* 직선의 평행이동 */
+function g_tr4(){
+  const m=pick([-3,-2,-1,1,2,3]), n=RZ(-5,5), a=RZ(-4,4), b=RZ(-4,4);
+  const nn = n + b - m*a;
+  return {
+    _dbg:{m:m, n:n, a:a, b:b, nn:nn},
+    tag:'직선의 평행이동',
+    q:'직선 <b>'+lineMN(m,n)+'</b> '+j_eul(n)+' '+X+'축의 방향으로 '+N(a)+'만큼, '
+      +Y+'축의 방향으로 '+N(b)+'만큼 평행이동한 직선의 방정식을 '+Y+' = <i>mx</i> + <i>n</i> 꼴로 구하시오.',
+    fig: planeOf([[-6,-6],[6,6]],[{t:'line',a:m,b:-1,c:n}]),
+    solFig: planeOf([[-6,-6],[6,6]],[{t:'line',a:m,b:-1,c:n},
+            {t:'line',a:m,b:-1,c:nn,color:'#e5484d'}]),
+    hint:'직선을 평행이동해도 <b>기울기는 바뀌지 않습니다.</b> '
+       +'식에서 '+X+' 자리에 '+X+' − (가로 이동량), '+Y+' 자리에 '+Y+' − (세로 이동량) 을 넣고 정리합니다.',
+    fields:[{label:'기울기 m',ans:[String(m)]},
+            {label:'y절편 n',ans:[String(nn)]}],
+    sol:[
+      ''+X+' 자리에 '+X+' − '+par(a)+' '+j_eul(a)+', '+Y+' 자리에 '+Y+' − '+par(b)+' '+j_eul(b)+' 넣습니다.',
+      ''+Y+' − '+par(b)+' = '+term(m,'('+X+' − '+par(a)+')')+' + '+par(n),
+      '오른쪽 괄호를 풀면 '+Y+' − '+par(b)+' = '+term(m,X)+sg(-m*a)+' + '+par(n),
+      ''+N(b)+j_eul(b)+' 넘겨 정리하면 <b>'+lineMN(m,nn)+'</b> 입니다.',
+      '기울기는 '+N(m)+' '+j_ro(m)+' <b>그대로</b>이고, '+Y+'절편만 '+N(n)+' 에서 '+N(nn)+' '+j_ro(nn)+' 바뀌었습니다.'
+    ]
+  };
+}
+
+/* ───── 15. 대칭이동 (자습 12차시) ───── */
+const SYM = [
+  {k:'x축',  f:(x,y)=>[x,-y]},
+  {k:'y축',  f:(x,y)=>[-x,y]},
+  {k:'원점', f:(x,y)=>[-x,-y]},
+  {k:'y=x',  f:(x,y)=>[y,x]}
+];
+function symName(k){ return k==='x축' ? X+'축' : k==='y축' ? Y+'축' : k==='원점' ? '원점' : '직선 '+Y+' = '+X; }
+function symRule(k){
+  return k==='x축'  ? Y+' 의 부호만 바뀝니다 : ('+X+', '+Y+') → ('+X+', −'+Y+')'
+       : k==='y축'  ? X+' 의 부호만 바뀝니다 : ('+X+', '+Y+') → (−'+X+', '+Y+')'
+       : k==='원점' ? '둘 다 부호가 바뀝니다 : ('+X+', '+Y+') → (−'+X+', −'+Y+')'
+       :              X+' 와 '+Y+' 를 서로 바꿉니다 : ('+X+', '+Y+') → ('+Y+', '+X+')';
+}
+/* 점의 대칭이동 */
+function g_sym1(){
+  const x=RZ(-6,6), y=RZ(-6,6);
+  const s = pick(SYM);
+  const r = s.f(x,y);
+  return {
+    _dbg:{x:x, y:y, kind:s.k},
+    tag:'점의 대칭이동',
+    q:'점 '+P(x,y)+j_eul(y)+' <b>'+symName(s.k)+'</b>에 대하여 대칭이동한 점의 좌표를 구하시오.',
+    fig: planeOf([[x,y],[r[0],r[1]]],[{t:'pt',x:x,y:y,label:'A'}]),
+    solFig: planeOf([[x,y],[r[0],r[1]]],[{t:'pt',x:x,y:y,label:'A'},
+            {t:'seg',x1:x,y1:y,x2:r[0],y2:r[1]},{t:'pt',x:r[0],y:r[1],label:'P'}]),
+    hint:'대칭이동은 <b>부호를 바꾸거나 자리를 바꾸는 것</b>입니다. '
+       +'어떤 축(또는 점, 직선)을 기준으로 뒤집는지 먼저 보세요.',
+    fields:[{label:'대칭이동한 점의 x좌표',ans:[String(r[0])]},
+            {label:'대칭이동한 점의 y좌표',ans:[String(r[1])]}],
+    sol:[
+      symName(s.k)+'에 대한 대칭이동은 '+symRule(s.k),
+      '점 '+P(x,y)+' 에 적용하면 <b>'+P(r[0],r[1])+'</b> 입니다.'
+    ]
+  };
+}
+/* 평행이동한 뒤 대칭이동 — a, b 구하기 */
+function g_sym2(){
+  const x=RZ(-5,5), y=RZ(-5,5), a=RZ(-4,4), b=RZ(-4,4);
+  const s = pick(SYM);
+  const mid=[x+a, y+b];
+  const r = s.f(mid[0], mid[1]);
+  return {
+    _dbg:{x:x, y:y, a:a, b:b, kind:s.k, mid:mid},
+    tag:'평행이동 뒤 대칭이동',
+    q:'점 '+P(x,y)+j_eul(y)+' '+X+'축의 방향으로 <i>a</i>만큼, '+Y+'축의 방향으로 <i>b</i>만큼 평행이동한 뒤 '
+      +'<b>'+symName(s.k)+'</b>에 대하여 대칭이동하였더니 점 '+P(r[0],r[1])+j_i(r[1])+' 되었다. '
+      +'<i>a</i>, <i>b</i> 의 값을 구하시오.',
+    hint:'마지막 점에서 <b>거꾸로</b> 올라가는 것이 빠릅니다. '
+       +'대칭이동을 한 번 더 하면 대칭이동하기 전으로 돌아갑니다.',
+    fields:[{label:'a 의 값',ans:[String(a)]},
+            {label:'b 의 값',ans:[String(b)]}],
+    sol:[
+      '대칭이동을 되돌립니다. '+symName(s.k)+' 대칭은 같은 것을 한 번 더 하면 제자리로 오므로, '
+        +P(r[0],r[1])+' 를 다시 대칭이동하면 평행이동만 끝난 점은 <b>'+P(mid[0],mid[1])+'</b> 입니다.',
+      '이제 평행이동만 보면 '+X+'좌표 : '+par(x)+' + <i>a</i> = '+N(mid[0])+' → <i>a</i> = <b>'+N(a)+'</b>',
+      ''+Y+'좌표 : '+par(y)+' + <i>b</i> = '+N(mid[1])+' → <i>b</i> = <b>'+N(b)+'</b>',
+      '<b>확인</b> — '+P(x,y)+' → 평행이동 → '+P(mid[0],mid[1])+' → '+symName(s.k)+' 대칭 → '+P(r[0],r[1])
+    ]
+  };
+}
+/* 원의 대칭이동 */
+function g_sym3(){
+  const cx=RZ(-5,5), cy=RZ(-5,5), r=R(1,4);
+  const s = pick(SYM);
+  const c2 = s.f(cx,cy);
+  return {
+    _dbg:{cx:cx, cy:cy, r:r, kind:s.k},
+    tag:'원의 대칭이동',
+    q:'원 <b>'+stdEq(cx,cy,r*r)+'</b> '+j_eul(r*r)+' <b>'+symName(s.k)+'</b>에 대하여 '
+      +'대칭이동한 원의 <b>중심과 반지름</b>을 구하시오.',
+    fig: planeOf([[cx-r,cy-r],[cx+r,cy+r],[c2[0]-r,c2[1]-r],[c2[0]+r,c2[1]+r]],
+          [{t:'circle',cx:cx,cy:cy,r:r},{t:'pt',x:cx,y:cy,label:'C'}]),
+    solFig: planeOf([[cx-r,cy-r],[cx+r,cy+r],[c2[0]-r,c2[1]-r],[c2[0]+r,c2[1]+r]],
+          [{t:'circle',cx:cx,cy:cy,r:r},{t:'pt',x:cx,y:cy,label:'C'},
+           {t:'circle',cx:c2[0],cy:c2[1],r:r,color:'#e5484d'},{t:'pt',x:c2[0],y:c2[1],label:'C′'}]),
+    hint:'원을 뒤집어도 <b>반지름은 그대로</b>입니다. 중심만 점의 대칭이동과 똑같이 옮기면 됩니다.',
+    fields:[{label:'대칭이동한 원의 중심 x좌표',ans:[String(c2[0])]},
+            {label:'대칭이동한 원의 중심 y좌표',ans:[String(c2[1])]},
+            {label:'반지름',ans:[String(r)]}],
+    sol:[
+      '원의 중심은 '+P(cx,cy)+', 반지름은 '+r+' 입니다.',
+      symName(s.k)+' 대칭 : '+symRule(s.k),
+      '중심이 '+P(c2[0],c2[1])+' '+j_ro(c2[1])+' 옮겨지고 반지름은 그대로 '+r+' 이므로 '
+        +'<b>'+stdEq(c2[0],c2[1],r*r)+'</b> 입니다.'
+    ]
+  };
+}
+/* 직선의 대칭이동 */
+function g_sym4(){
+  const a=pick([2,3,-2,-3,1,-1]), b=pick([2,3,-2,-3,1,-1]), c=RZ(-8,8);
+  const s = pick(SYM);
+  let A=a, B=b;
+  if(s.k==='x축'){ B=-b; }
+  else if(s.k==='y축'){ A=-a; }
+  else if(s.k==='원점'){ A=-a; B=-b; }
+  else { A=b; B=a; }
+  return {
+    _dbg:{a:a, b:b, c:c, kind:s.k, A:A, B:B},
+    tag:'직선의 대칭이동',
+    q:'직선 <b>'+lineGen(a,b,c)+'</b>'+'을 <b>'+symName(s.k)+'</b>에 대하여 '
+      +'대칭이동한 직선을 <i>ax</i> + <i>by</i> + <i>c</i> = 0 꼴로 나타낼 때, '
+      +X+' 의 계수와 '+Y+' 의 계수를 구하시오. (상수항은 '+N(c)+' 그대로입니다)',
+    fig: planeOf([[-7,-7],[7,7]],[{t:'line',a:a,b:b,c:c}]),
+    solFig: planeOf([[-7,-7],[7,7]],[{t:'line',a:a,b:b,c:c},
+            {t:'line',a:A,b:B,c:c,color:'#e5484d'}]),
+    hint:'식에서 '+X+' 와 '+Y+' 를 <b>무엇으로 바꿔 넣는지</b>만 기억하면 됩니다. '
+       +'상수항은 건드리지 않습니다.',
+    fields:[{label:'x 의 계수',ans:[String(A)]},
+            {label:'y 의 계수',ans:[String(B)]}],
+    sol:[
+      symName(s.k)+' 대칭은 식에서 '
+        +(s.k==='x축'  ? Y+' 자리에 −'+Y+' 를 넣습니다.'
+        : s.k==='y축'  ? X+' 자리에 −'+X+' 를 넣습니다.'
+        : s.k==='원점' ? X+' 자리에 −'+X+', '+Y+' 자리에 −'+Y+' 를 넣습니다.'
+        :                X+' 와 '+Y+' 를 서로 바꿔 넣습니다.'),
+      '넣고 정리하면 <b>'+lineGen(A,B,c)+'</b> 입니다.',
+      '따라서 '+X+' 의 계수는 <b>'+N(A)+'</b>, '+Y+' 의 계수는 <b>'+N(B)+'</b> 입니다.'
+    ]
+  };
+}
+
 /* ══════════════════════════════════════════════════════════════
    주제 목록 — 새 주제를 넣으려면 이 배열에 한 칸 더 쓰면 됩니다.
    ══════════════════════════════════════════════════════════════ */
@@ -1346,7 +1592,52 @@ const TOPICS = [
   </ol></div>
   <div class="warnbox">⚠ <i>k</i> 의 범위를 묻는 문제는 | <i>k</i> | &lt; (어떤 수) 꼴이 됩니다 —
   <b>절댓값 부등식</b>이므로 「사이」로 풀어야 합니다.<br>
-  ⚠ 분모가 ${sqh('2')}, ${sqh('5')} 처럼 무리수면 그대로 두고 <b>양변을 제곱</b>해서 비교하면 편합니다.</div>` }
+  ⚠ 분모가 ${sqh('2')}, ${sqh('5')} 처럼 무리수면 그대로 두고 <b>양변을 제곱</b>해서 비교하면 편합니다.</div>` },
+{ id:'trans', unit:5, unitName:'Ⅰ-4 도형의 이동', name:'평행이동', pages:'자습 11차시',
+  desc:'옮긴 만큼 더하기 — 점 · 원 · 직선', gens:[g_deg1,g_tr1,g_tr2,g_tr3,g_tr4], concept:`
+  <div class="fx"><b>점의 평행이동</b><br>
+  점 (${X}, ${Y}) 를 ${X}축의 방향으로 <i>a</i>, ${Y}축의 방향으로 <i>b</i> 만큼 옮기면<br>
+  → <b>(${X} + <i>a</i>, ${Y} + <i>b</i>)</b> &nbsp;— 좌표에 이동량을 <b>그대로 더합니다.</b></div>
+  ${planeOf([[-1,-1],[6,5]],[{t:'pt',x:1,y:1,label:'A'},{t:'seg',x1:1,y1:1,x2:4,y2:3},
+     {t:'pt',x:4,y:3,label:'A′'}],1)}
+  <p class="muted">${X}축 방향으로 3, ${Y}축 방향으로 2 만큼 옮긴 모습 — (1, 1) → (4, 3)</p>
+  <div class="fx"><b>도형의 평행이동 — 식에서는 빼기</b><br>
+  도형 <i>f</i>(${X}, ${Y}) = 0 을 ${X}축 방향 <i>a</i>, ${Y}축 방향 <i>b</i> 만큼 옮기면<br>
+  → <b><i>f</i>(${X} − <i>a</i>, ${Y} − <i>b</i>) = 0</b> &nbsp;— 식에서는 <b>빼서 넣습니다.</b></div>
+  <div class="warnbox">⚠ <b>점은 더하고 식은 뺍니다.</b> 여기서 가장 많이 틀립니다.<br>
+  헷갈리면 <b>점으로 먼저 푸세요.</b> 원은 중심만, 직선은 지나는 점 하나만 옮기면 됩니다.</div>
+  <div class="explain"><b>모양은 바뀌지 않습니다</b><ul>
+  <li><b>원</b>을 옮기면 <b>중심만</b> 옮겨지고 <b>반지름은 그대로</b>입니다.</li>
+  <li><b>직선</b>을 옮기면 <b>기울기는 그대로</b>이고 ${Y}절편만 바뀝니다.</li>
+  </ul></div>
+  <div class="fx"><b>방정식의 차수로 도형 알아보기</b><br>
+  ${X}² + ${Y}² = 9 → 둘 다 2차 → <b>원</b><br>
+  ${X} + ${Y} = 9 → 둘 다 1차 → <b>직선</b><br>
+  ${X}² + ${Y} = 9 → ${X}만 2차 → <b>포물선</b></div>` },
+
+{ id:'sym', unit:5, unitName:'Ⅰ-4 도형의 이동', name:'대칭이동', pages:'자습 12차시',
+  desc:'뒤집기 — 부호를 바꾸거나 자리를 바꾸거나', gens:[g_sym1,g_sym2,g_sym3,g_sym4], concept:`
+  <div class="fx"><b>점의 대칭이동 — 네 가지</b><br>
+  ${X}축에 대하여 : (${X}, ${Y}) → <b>(${X}, −${Y})</b> &nbsp; ${Y} 부호만 바뀜<br>
+  ${Y}축에 대하여 : (${X}, ${Y}) → <b>(−${X}, ${Y})</b> &nbsp; ${X} 부호만 바뀜<br>
+  원점에 대하여 : (${X}, ${Y}) → <b>(−${X}, −${Y})</b> &nbsp; 둘 다 바뀜<br>
+  직선 ${Y} = ${X} 에 대하여 : (${X}, ${Y}) → <b>(${Y}, ${X})</b> &nbsp; 자리를 서로 바꿈</div>
+  ${planeOf([[-4,-4],[4,4]],[{t:'pt',x:3,y:2,label:'A'},{t:'pt',x:3,y:-2,label:'x축'},
+     {t:'pt',x:-3,y:2,label:'y축'},{t:'pt',x:-3,y:-2,label:'원점'},{t:'pt',x:2,y:3,label:'y=x'},
+     {t:'line',a:1,b:-1,c:0,color:'#94a3b8'}],1)}
+  <p class="muted">점 (3, 2) 를 네 가지로 대칭이동한 자리 — 회색 선이 ${Y} = ${X} 입니다.</p>
+  <div class="fx"><b>도형의 대칭이동 — 식에 그대로 넣습니다</b><br>
+  ${X}축 대칭 : 식의 ${Y} 자리에 <b>−${Y}</b><br>
+  ${Y}축 대칭 : 식의 ${X} 자리에 <b>−${X}</b><br>
+  원점 대칭 : ${X} → <b>−${X}</b>, ${Y} → <b>−${Y}</b><br>
+  ${Y} = ${X} 대칭 : ${X} 와 ${Y} 를 <b>서로 바꿔</b> 넣습니다</div>
+  <div class="explain"><b>원과 직선은 이렇게 하면 빠릅니다</b><ul>
+  <li><b>원</b> — <b>중심만</b> 대칭이동하고 반지름은 그대로 씁니다.</li>
+  <li><b>직선</b> — 식에 바로 넣습니다. <i>ax</i> + <i>by</i> + <i>c</i> = 0 에서
+  <b>상수항 <i>c</i> 는 그대로</b>이고 계수의 부호(또는 자리)만 바뀝니다.</li>
+  </ul></div>
+  <div class="warnbox">⚠ <b>평행이동 뒤 대칭이동</b> 문제는 순서를 지켜야 합니다. 거꾸로 하면 답이 달라집니다.<br>
+  ⚠ 거꾸로 <i>a</i>, <i>b</i> 를 찾을 때는 <b>대칭이동을 한 번 더 해서</b> 되돌린 뒤 평행이동만 따집니다.</div>` }
 ];
 
 /* ══════════════ 여기부터는 대개 손대지 않습니다 ══════════════ */
