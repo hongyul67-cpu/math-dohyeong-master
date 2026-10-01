@@ -6,6 +6,8 @@
 <title>도형의 방정식 자습</title>
 <!-- 수업용 「모두 같은 문제」 — 다른 공용 스크립트보다 먼저 -->
 <script src="https://hongyul67-cpu.github.io/links/fixorder.js"></script>
+<script src="https://hongyul67-cpu.github.io/links/fig.js"></script>
+<script src="figs.js"></script>
 <style>
   :root{
     --bg:#f5f6f8; --card:#fff; --line:#e2e5ea; --tx:#1c2430; --dim:#6b7684;
@@ -67,6 +69,9 @@
   .sq > span{border-top:1.4px solid currentColor;padding:0 2px 0 1px;margin-left:-1px}
 
   /* 공식 상자 */
+  .figbox{margin:14px 0 4px}
+  .figbox-h{font-weight:700;font-size:14.5px;margin-bottom:8px}
+  .figbox-h small{font-weight:400;opacity:.7;margin-left:6px}
   .fx{background:#f4f8ff;border:1px solid #d7e5ff;border-radius:12px;padding:12px 14px;margin:10px 0}
   .fx b{color:#1d4ed8}
   .warnbox{background:#fff7e8;border:1px solid #f6e0b5;border-radius:12px;padding:10px 14px;margin:10px 0}
@@ -1698,13 +1703,19 @@ function renderLearnList(box){
     grid.appendChild(b);
   });
 }
+/* 배우기 그림 (figs.js) — 주제 id 로 찾아 개념 맨 아래에 붙인다 */
+function learnFigs(id){
+  if(!window.FIG || !window.FIGS) return '';
+  const keys=Object.keys(FIGS).filter(k=>(FIGS[k].topics||[]).indexOf(id)>=0);
+  return keys.length ? '<div class="figbox"><div class="figbox-h">🖼️ 그림으로 보기 <small>그림을 누르면 크게</small></div>'+FIG.gallery(keys)+'</div>' : '';
+}
 function renderLearnOne(t){
   const box=$('#view'); box.innerHTML='';
   const back=el('<button class="btn btn-ghost">← 주제 목록</button>');
   back.onclick=function(){ render('learn'); };
   box.appendChild(back);
   box.appendChild(el('<div class="card" style="margin-top:10px">'+pillOf(t)
-    +'<h3 style="margin-top:6px">'+t.name+'</h3>'+t.concept+'</div>'));
+    +'<h3 style="margin-top:6px">'+t.name+'</h3>'+t.concept+learnFigs(t.id)+'</div>'));
 
   const ex=el('<div class="card"><h3>✅ 예제 — 풀이를 다 보여 줍니다</h3><div id="exBody"></div>'
     +'<div class="row" style="margin-top:12px">'
